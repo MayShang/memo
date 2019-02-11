@@ -1,0 +1,154 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Automatic table of contents</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- Material Design Bootstrap -->
+    <link href="css/mdb.min.css" rel="stylesheet">
+    <!-- Your custom styles (optional) -->
+    <link href="css/sets.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- Start your project here-->
+    <div class="container">
+        <!--Content-->
+        <div class="">
+          <p class="alert-box">js part is dynamically generate toc id anchor.</p>
+          <h5>steps:</h5>
+          <ol>
+            <li>assign placeholder</li>
+            <li>add js, loop the whole doc, each function, add new <code>li</code> element and <code>a</code> element, add id to attribute. </li>
+            <li>add css</li>
+          </ol>
+        </div>
+        <div class="row">
+          <div class="col-10">
+
+            <h2>html contents</h2>
+            <!-- example of html part -->
+            <article>
+              <h1>Documentation</h1>
+
+              <p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.</p>
+
+              <div class="all-questions">
+
+                <h3 id="one">How do you smurf a murf?</h3>
+
+                <p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.</p>
+
+                <h3 id="two">How do many licks does a giraffe?</h3>
+
+                <p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.</p>
+
+                <h3 id="three">Which Frank is?</h3>
+
+                <p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.</p>
+
+                <h3 id="four">Is fourteen enough?</h3>
+
+                <p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.</p>
+
+                <h3 id="five">Is a circle an oval y/n?</h3>
+
+                <p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.</p>
+
+                <h3 id="six">Many mongerals manifest mountains</h3>
+
+                <p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.</p>
+
+                <h3 id="seven">How would you like a soda drink?</h3>
+
+                <p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.</p>
+
+                <h3 id="eight">I would very much like a soda drink.</h3>
+
+                <p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.</p>
+
+                <h3 id="nine">Thank you for accepting the soda drink.</h3>
+
+                <p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.</p>
+
+              </div>
+              <!-- /example of html part -->
+
+              <!-- example of css part -->
+              <div class="">
+                <h2>CSS part code</h2>
+
+                <pre>
+                  article {
+                    max-width: 50em;
+                    background: white;
+                    padding: 2em;
+                    margin: 1em auto;
+                  }
+
+                  .table-of-contents {
+                    float: right;
+                    width: 40%;
+                    background: #eee;
+                    font-size: 0.8em;
+                    padding: 1em 2em;
+                    margin: 0 0 0.5em 0.5em;
+                  }
+                  .table-of-contents ul {
+                    padding: 0;
+                  }
+                  .table-of-contents li {
+                    margin: 0 0 0.25em 0;
+                  }
+                  .table-of-contents a {
+                    text-decoration: none;
+                  }
+                  .table-of-contents a:hover,
+                  .table-of-contents a:active {
+                    text-decoration: underline;
+                  }
+
+                </pre>
+              </div>
+              <!-- /example of css part -->
+
+              <!-- example of js part -->
+              <div class="">
+                <h2>JS code</h2>
+                <p>find js code from toc.js toc part code</p>
+              </div>
+              <!-- /example of js part -->
+            </div>
+            <div class="col-2">
+              <div class="toc-area">
+
+              </div>
+            </div>
+          </div>
+
+        <!--/Content-->
+    </div>
+    <!-- /Start your project here-->
+
+    <!-- SCRIPTS -->
+    <!-- JQuery -->
+    <script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
+    <!-- Bootstrap tooltips -->
+    <script type="text/javascript" src="js/popper.min.js"></script>
+    <!-- Bootstrap core JavaScript -->
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <!-- MDB core JavaScript -->
+    <script type="text/javascript" src="js/mdb.min.js"></script>
+    <script type="text/javascript" src="js/toc.js"></script>
+
+</body>
+
+</html>

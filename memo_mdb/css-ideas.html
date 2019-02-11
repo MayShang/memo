@@ -1,0 +1,312 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>CSS Howto Ideas</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- Material Design Bootstrap -->
+    <link href="css/mdb.min.css" rel="stylesheet">
+    <!--google font icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Your custom styles (optional) -->
+    <link href="css/style.min.css" rel="stylesheet">
+    <link href="css/sets.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- Start your project here-->
+    <div class="row">
+      <div class="col-10">
+
+
+    <div class="container">
+        <p class="alert-box" style="position: sticky; top: 0">CSS basic or important syntax you may confuse with. Try to understand them and use them in reality. </p>
+
+        <!-- transparency -->
+        <section>
+
+          <div class="row">
+            <!-- transparency title -->
+            <div class="col-6">
+              <h3>transparency</h3>
+              <p>The <code>opacity</code> property specifies the opacity/transparency of an element.</p>
+              <hr>
+              <h5>usage</h5>
+              <pre>opacity: 0.5;</pre>
+              <p class="alert-box">transparency can be used at any elements. </p>
+            </div>
+
+            <!-- transparency example -->
+            <div class="col-6">
+              <h5>Examples: </h5>
+              <img src="img/img_5terre.jpg" alt="" class="img-opacity">
+              <img src="img/img_forest.jpg" alt="" class="img-opacity">
+
+            </div>
+          </div>
+        </section>
+        <!-- /transparency -->
+
+        <hr>
+        <!-- outline -->
+        <section>
+          <!-- outline defination -->
+          <div class="row">
+            <div class="col-6">
+              <h3>Outline</h3>
+              <p>An outline is a line that is drawn around elements, OUTSIDE the borders, to make the element "stand out".</p>
+
+              <h4>outline properties: </h4>
+              <ul>
+                <li>outline-style: dotted, dashed, solid, double, none, hidden </li>
+                <li>outline-color</li>
+                <li>outline-width</li>
+                <li>outline-offset: <small>The outline-offset property adds space between an outline and the edge/border of an element. The space between an element and its outline is transparent.</small></li>
+                <li>outline: <small>A shorthand property for setting outline-width, outline-style, and outline-color in one declaration</small></li>
+              </ul>
+
+              <hr>
+
+              <h5>Usage </h5>
+              <pre>
+                .outline-double {
+                    border: 1px solid black;
+                    outline-style: double;
+                    outline-color: green;
+                }
+
+                p {
+                	outline: dotted 10px red;
+                }
+              </pre>
+            </div>
+
+            <!-- outline examples -->
+            <div class="col-6">
+              <h5>outline examples</h5>
+              <p class="outline-double">A double green outline.</p>
+              <p class="outline-dashed">A dashed red outline.</p>
+            </div>
+          </div>
+        </section>
+        <!-- /outline -->
+
+        <hr>
+        <!-- Overflow  -->
+        <section class="row">
+          <div class="col-6">
+            <h3>Overflow</h3>
+            <p>The CSS overflow property controls what happens to content that is too big to fit into an area.</p>
+
+            <p>The overflow property specifies whether to clip content or to add scrollbars when the content of an element is too big to fit in a specified area.</p>
+
+            <p>overflow values: </p>
+            <ul>
+              <li><strong>visible:</strong> The overflow property specifies whether to clip content or to add scrollbars when the content of an element is too big to fit in a specified area.</li>
+              <li><strong>hidden: </strong> The overflow is clipped, and the rest of the content will be invisible</li>
+              <li><strong>scroll: </strong> The overflow is clipped, but a scrollbar is added to see the rest of the content</li>
+              <li><strong>auto</strong> If overflow is clipped, a scrollbar should be added to see the rest of the content</li>
+            </ul>
+
+            <p>overflow type:</p>
+            <ul>
+              <li>overflow</li>
+              <li>overflow-x</li>
+              <li>overflow-y</li>
+            </ul>
+            <p class="alert-box"> Note: The <code>overflow </code> property only works for block elements with a specified height.</p>
+          </div>
+
+          <!-- overflow examples -->
+          <div class="col-6">
+            <p class="overflow-visible">You can use the overflwo property when you want to have better control of the layout. The overflow will be clipped if set its value to hidden.</p>
+          </div>
+        </section>
+        <!-- /Overflow  -->
+
+        <hr>
+
+        <!-- box-sizing -->
+        <section class="row">
+          <div class="col-6">
+            <h3>box-sizing</h3>
+            <p>The box-sizing property allows us to include the padding and border in an element's total width and height.</p>
+
+            <p>If you set box-sizing: border-box; on an element padding and border are included in the width and height:</p>
+
+            <p class="alert-box">Since the result of using the box-sizing: border-box; is so much better, many developers want all elements on their pages to work this way.</p>
+
+            <h5>usage</h5>
+            <pre>box-sizing: border-box;</pre>
+
+            <pre>
+              * {
+                  box-sizing: border-box;
+              }
+            </pre>
+          </div>
+
+          <!-- examples of box-sizing -->
+          <div class="col-6">
+
+          </div>
+          <!-- / examples of box-sizing -->
+        </section>
+        <!-- / box-sizing -->
+        <hr>
+        <!-- layout: display -->
+        <section class="row">
+          <!-- display -->
+          <div class="col-6">
+            <h3>display</h3>
+            <p>The display property specifies if/how an element is displayed.</p>
+
+            <p>Every HTML element has a default display value depending on what type of element it is. The default display value for most elements is block or inline.</p>
+
+            <h5>block-level elements</h5>
+            <ul>
+              <li>div</li>
+              <li>h1 - h6</li>
+              <li>p</li>
+              <li>form</li>
+              <li>header</li>
+              <li>footer</li>
+              <li>section</li>
+            </ul>
+
+            <h5>inline elements</h5>
+            <ul>
+              <li>span</li>
+              <li>a</li>
+              <li>img</li>
+            </ul>
+
+            <h5>usage</h5>
+            <p>As mentioned, every element has a default display value. However, you can override this.</p>
+
+            <p>Changing an inline element to a block element, or vice versa, can be useful for making the page look a specific way, and still follow the web standards.</p>
+
+            <h5>difference between visibility: hidden and display: none </h5>
+
+            <pre>
+              h1 {
+              	visibility: hidden;
+              }
+            </pre>
+            <p>visibility still take up space though hidden, but display:none does not take up any space.</p>
+          </div>
+          <!-- / display -->
+
+          <!-- example of display -->
+          <div class="col-6">
+            <h4>examples of display</h4>
+            <p>A common example is making inline li element for horizontal menus. </p>
+
+            <pre>
+              li {
+                  display: inline;
+              }
+            </pre>
+
+            <p>Display a list of links as a horizontal menu:</p>
+
+            <ul>
+              <li style="display: inline"><a href="/html/default.asp" target="_blank">HTML</a></li>
+              <li style="display: inline"><a href="/css/default.asp" target="_blank">CSS</a></li>
+              <li style="display: inline"><a href="/js/default.asp" target="_blank">JavaScript</a></li>
+            </ul>
+          </div>
+          <!-- / example of display -->
+
+        </section>
+        <!-- / layout: display -->
+        <hr>
+        <!-- box module -->
+        <section class="row">
+          <!-- box module concept -->
+          <div class="col-6">
+            <h3>box module</h3>
+            <p>All HTML elements can be considered as boxes. In CSS, the term "box model" is used when talking about design and layout.</p>
+
+            <p>The CSS box model is essentially a box that wraps around every HTML element. It consists of: margins, borders, padding, and the actual content. The image below illustrates the box model:</p>
+            <img src="img/css-box-module.JPG" style="width: 90%" alt="">
+          </div>
+          <!-- / box module concept -->
+
+          <!-- example of box module -->
+          <div class="col-6">
+            <h4>examples</h4>
+            <h5>text centered example</h5>
+            <p class="text-centered">box module centered</p>
+            <pre>
+              .text-centered {
+                  position: absolute;
+                  left: 0;
+                  top: 50%;
+                  width: 100%;
+                  text-align: center;
+                  font-size: 18px;
+              }
+            </pre>
+          </div>
+          <!-- / example of box module -->
+        </section>
+        <!-- / box module -->
+
+        <hr>
+        <!-- position -->
+        <section class="row">
+          <!-- position concept -->
+          <div class="col-6">
+            <h3>position</h3>
+            <ul>
+              <li><strong> static:</strong> HTML elements are positioned static by default.</li>
+              <li><strong>relative:</strong> relative to element itself, top etc position must correspoding set to get it work. Setting the top, right, bottom, and left properties of a relatively-positioned element will cause it to be adjusted away from its normal position. Other content will not be adjusted to fit into any gap left by the element.</li>
+              <li><strong>fixed:</strong> is positioned relative to the viewport, which means it always stays in the same place even if the page is scrolled. The top, right, bottom, and left properties are used to position the element.</li>
+              <li><strong>absolute: </strong>relative to its parent, if no top etc other position set, just like <code>static</code>. if an absolute positioned element has no positioned ancestors, it uses the document body, and moves along with page scrolling.</li>
+              <li><strong>sticky: </strong>cooperate work with top etc position </li>
+              <li><strong>z-index:</strong> this property specifies the stack order of an element (which element should be placed in front of, or behind, the others).</li>
+            </ul>
+          </div>
+          <!-- / position concept -->
+
+          <!-- example of position -->
+          <div class="col-6">
+            <h5>examples of position</h5>
+            <p class="p-pos">position test</p>
+          </div>
+          <!-- / example of position -->
+        </section>
+        <!-- / position -->
+
+    </div>
+  </div>
+  <div class="col-2">
+    <div class="toc-area">
+
+    </div>
+  </div>
+</div>
+    <!-- /Start your project here-->
+
+    <!-- SCRIPTS -->
+    <!-- JQuery -->
+    <script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
+    <!-- Bootstrap tooltips -->
+    <script type="text/javascript" src="js/popper.min.js"></script>
+    <!-- Bootstrap core JavaScript -->
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <!-- MDB core JavaScript -->
+    <script type="text/javascript" src="js/mdb.min.js"></script>
+    <script type="text/javascript" src="js/sets.js"></script>
+</body>
+
+</html>

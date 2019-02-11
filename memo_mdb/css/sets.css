@@ -1,0 +1,199 @@
+/*
+--------------------*/
+
+
+
+/* alert-box
+--------------------*/
+.alert-box-note {
+  box-sizing: border-box;
+  /* max-width: 42rem; */
+  overflow: hidden;
+  margin-bottom: 20px;
+  margin-top: 10px;
+  padding: 10px;
+  clear: both;
+  clear: none;
+  background-color: #FDCD6D;
+  font-family: x-locale-heading-primary,zillaslab,Palatino,"Palatino Linotype",x-locale-heading-secondary,serif;
+  font-size: 18px;
+  font-size: 1.125rem;
+  border-left-width: 5px;
+  border-left-style: solid;
+
+}
+
+.alert-box-note::before {
+    content: url(../icons/baseline-all_inbox-24px.svg);
+    transform: scaleY(-.8) scaleX(.8);
+}
+
+.alert-box {
+  box-sizing: border-box;
+  /* max-width: 42rem; */
+  overflow: hidden;
+  margin-bottom: 20px;
+  margin-top: 10px;
+  padding: 10px;
+  clear: both;
+  clear: none;
+  background-color: #FDCD6D;
+  font-family: x-locale-heading-primary,zillaslab,Palatino,"Palatino Linotype",x-locale-heading-secondary,serif;
+  font-size: 18px;
+  font-size: 1.125rem;
+  border-left-width: 5px;
+  border-left-style: solid;
+
+}
+
+.alert-box-strong {
+  box-sizing: border-box;
+  /* max-width: 42rem; */
+  overflow: hidden;
+  margin-bottom: 20px;
+  margin-top: 10px;
+  padding: 10px;
+  clear: both;
+  clear: none;
+  background-color: #eee;
+  font-family: x-locale-heading-primary,zillaslab,Palatino,"Palatino Linotype",x-locale-heading-secondary,serif;
+  font-size: 16px;
+  font-weight: 100;
+  /* font-size: 1.125rem; */
+  border-left-width: 5px;
+  border-left-style: solid;
+}
+
+/* right-todo-blocking
+---------------------*/
+.right-todo-block {
+  position: fixed;
+  bottom: 20px;
+  font-size: 14px;
+  font-weight: 100;
+}
+
+/* pre
+---------------------*/
+pre {
+  font-family: x-locale-heading-primary,zillaslab,Palatino,"Palatino Linotype",x-locale-heading-secondary,serif;
+  border: 1px solid #eee;
+  /* margin: 2rem;
+  font-size: 18px; */
+}
+
+/* heading color
+--------------------*/
+.heading-color {
+  color: #000099;
+  font-weight: 200;
+  margin: 15px;
+}
+
+/* img transparency
+---------------------*/
+.img-opacity {
+  width: 300px;
+  opacity: 0.5;
+}
+
+.img-opacity:hover {
+  opacity: 1.0;
+}
+
+/* outline
+----------------------*/
+.outline-red {
+  /* border: 1px solid black; */
+  outline-style: solid;
+  outline-color: red;
+  padding: 3px;
+  display: inline;
+  margin: 3px;
+}
+
+.outline-double {
+  border: 1px solid black;
+  outline-style: double;
+  outline-color: green;
+}
+
+.outline-dashed {
+    border: 1px solid black;
+    outline-style: dashed;
+    outline-color: red;
+    outline-width: thin;
+}
+
+/* overflow
+---------------------------*/
+.overflow-visible {
+    width: 200px;
+    height: 100px;
+    background-color: #eee;
+    overflow: auto;
+}
+
+
+/* table-of-contents
+--------------------------*/
+.table-of-contents {
+  position:fixed;
+  top: 20px;
+  clear: both;
+  float: right;
+  /* width: 15%; */
+  background: #eee;
+  font-size: 0.8em;
+  padding: 1em 2em;
+  margin: 0 0 0.5em 0.5em;
+
+}
+.table-of-contents ul {
+  padding: 0;
+}
+.table-of-contents li {
+  margin: 0 0 0.25em 0;
+}
+.table-of-contents a {
+  text-decoration: none;
+}
+.table-of-contents a:hover,
+.table-of-contents a:active {
+  text-decoration: underline;
+}
+
+/* text centered
+--------------------------*/
+.text-centered {
+    position: absolute;
+    left: 0;
+    top: 80%;
+    width: 100%;
+    text-align: center;
+    font-size: 18px;
+    color: red;
+}
+
+/* position test
+--------------------------*/
+.p-pos {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  border: 2px solid black;
+}
+
+/* todo checked
+--------------------------*/
+.todo-checked {
+  color: 	#208000;
+}
+
+.todo-done {
+  color: 	#208000;
+}
+
+.todo-working {
+  color: 	#208000;
+}
