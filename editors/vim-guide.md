@@ -112,3 +112,10 @@ colorscheme onedark
 ```
 :set wrap linebreak nolist
 ```
+
+## how to set vim dictionary
+```
+set dictionary+=/usr/share/dict/words
+inoremap <c-k> <c-x><c-k>
+```
+

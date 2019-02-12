@@ -469,3 +469,21 @@ but what this will look like?
 2. every language basically has its own power toolkits, this is the reason why it get people involved, except C language. but C is flexiable and extendable, just need developer take care of everything they will use. but for other language, they have tools, just find it and use the best of them.
 3. basic rule of learning a new language is to use it to implement what you want. dont' hate making mistakes.  
 4. practice actually is implementation.
+
+#### how to undertand style
+1. load model
+2. get content image and style image
+3. find a deeper layer used to calculate content feature, `g.get_tensor_by_name(layer_name).eval(feed_dict={x:img})` to get content feature. =>from analysis, this feature is Variable.
+4. find all conv layers used to calculate style feature, still use feature method to get a style activations list per each conv layer. which is the raw data, need to convet to gram_matrix. matmul(x.T, x).
+5. make content_loss operation, this loss can be trained. `tf.nn.l2_loss((current_feature - content_features)/content_features.size)` => need input image as placeholder. 
+6. make style_loss operation, `tf.nn.l2_loss((current_layer_gram_feature - style_feature)/style_feature.size)`
+7. make the total_loss, `alpha * content_loss + beta * style_loss`, and optimizer
+7. train
+
+
+# todo
+1. how to debug python
+2. how to save list, array or something else, and load them when needed.
+3. how to split the whole process into sub steps, and every steps are indepent.
+4. make sess4.py work using placeholder. currently it use interactiveSession works, but how to convert to normal process, you need enfort to work on it. [this is the learning rules, get chanlge and resolve it, you will improve. this process is not easy, but full of excitement. in contrast, leave or run away when chanle happens, you will always walk around the shallow water, never can be able to dive into the essentials.]
+
