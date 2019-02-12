@@ -463,3 +463,9 @@ author says, we use a forward pass up to the layer that we are interested in, an
 [cmt]basically I understood. for pretrained model, every layers parameters are frozen, when you push input into any layer, you will get the same effection when training. for each layer, every pixel contribute. 
 so author says, we will find the max neurons of activation in that layer, and to see what pixel works for by using gradient of max value with respect to image. actually for this max value, all pixels of image are contribute. 
 but what this will look like?
+
+#### how to understand the process of learning a new language
+1. A new language is actually a new expression which that new interpretor can understand. 
+2. every language basically has its own power toolkits, this is the reason why it get people involved, except C language. but C is flexiable and extendable, just need developer take care of everything they will use. but for other language, they have tools, just find it and use the best of them.
+3. basic rule of learning a new language is to use it to implement what you want. dont' hate making mistakes.  
+4. practice actually is implementation.
