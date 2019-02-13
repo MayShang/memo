@@ -289,6 +289,56 @@ or even for generating new data.
     - you actually know what you want out of your data.
 * Autoencoders, a type of nn that learns to encode its inputs, often using much less data.it tries to output whatever it was given as input.
 
+* tensor, tensor is a symbolic handle, this handle is one of the output of an operation. it does not hold the values of that operation. but instead provides a means of computing those values in session. So tensor is not variable, it is JUST a handle, it provides computation. 
+* t.eval() is a shortcut for calling `tf.get_default_session().run(t)`
+so in `sess.run(op, feed_dict={})` =>`op.eval(feed_dict={})`
+
+### how to undertand default session and default graph
+```
+graph1 = tf.Graph()
+graph2 = tf.Graph()
+
+with graph1.as_default() as graph:
+  a = tf.constant(0, name='a')
+  graph1_init_op = tf.global_variables_initializer()
+
+with graph2.as_default() as graph:
+  a = tf.constant(1, name='a')
+  graph2_init_op = tf.global_variables_initializer()
+
+sess1 = tf.Session(graph=graph1)
+sess2 = tf.Session(graph=graph2)
+sess1.run(graph1_init_op)
+sess2.run(graph2_init_op)
+
+\# Both tensor names are a!
+print(sess1.run(graph1.get_tensor_by_name('a:0'))) # prints 0
+print(sess2.run(graph2.get_tensor_by_name('a:0'))) # prints 1
+
+with sess1.as_default() as sess:
+  print(sess.run(sess.graph.get_tensor_by_name('a:0'))) # prints 0
+
+with sess2.as_default() as sess:
+  print(sess.run(sess.graph.get_tensor_by_name('a:0'))) # prints 1
+
+with graph2.as_default() as g:
+  with sess1.as_default() as sess:
+    print(tf.get_default_graph() == graph2) # prints True
+    print(tf.get_default_session() == sess1) # prints True
+
+    \# This is the interesting line
+    print(sess.run(sess.graph.get_tensor_by_name('a:0'))) # prints 0
+    print(sess.run(g.get_tensor_by_name('a:0'))) # fails
+
+print(tf.get_default_graph() == graph2) # prints False
+print(tf.get_default_session() == sess1) # prints False
+```
+you can't run an operation in graph2 with sess1. this example is typical.
+so what the rules to assign session and graph in training learning. 
+
+### what are the rules of design session and graph
+
+
 # pyplot basic operation
 ## example1
 ```
@@ -449,6 +499,67 @@ res = res / np.sum(res)
 infers = [(res[idx], net['labels'][idx]) for idx in res.argsort()[-5:][::-1]]
 
 ```
+the points for loaded pretrained model:
+1. the placehoder of this model is the first layer tensor
+```
+x = g.get_tensor_by_name(input_name)
+```
+
+2. for other layers operation, `x` is always the placeholder tensor to run.
+```
+softmax = g.get_tensor_by_name(names[-1]+':0')        # operation
+res = np.squeeze(softmax.eval(feed_dict={x: img_4d})) # equal to `sess.run(softmax, feed_dict={x:img_4d})`
+```
+3. for this 'x' still a placeholder which need to feed_dict during 'run', so some value still keep unknow untill after `sess.run()`
+
+```
+def get_gram_matrix(g, name):
+    layer_i = g.get_tensor_by_name(name)
+    layer_shape = layer_i.get_shape().as_list()
+
+    print(layer_shape)     ======> shape will be [?, ?, ?, 512]
+
+    layer_size = layer_shape[1] * layer_shape[2] * layer_shape[3] ===> will be wrong if input is `x`
+
+    layer_flat = tf.reshape(layer_i, [-1, layer_shape[3]])
+    # gram_matrix = tf.matmul(tf.transpose(layer_flat), layer_flat) / layer_size
+    gram_matrix = tf.transpose(layer_i)
+    print(gram_matrix.shape)
+    return gram_matrix
+
+x = g.get_tensor_by_name(names[0] + ':0')
+
+layer_name = 'vgg/conv4_2/conv4_2:0'
+gram_op = get_gram_matrix(g, layer_name)
+
+with tf.Session(graph=g) as sess:
+    s = sess.run(gram_op, feed_dict={x:img_4d})
+    print(s.shape)  =====> this working, because it's valid after running
+
+```
+
+4. we can use `input_map` to map input and get everything inside the network prefixed before run
+
+```
+g = tf.Graph()
+net = vgg16.get_vgg_model()
+
+with tf.Session(graph=g) as sess, g.device('/cpu:0'):
+    # net_input = tf.Variable(img_4d)
+    net_input = tf.get_variable(name='input', shape=(1, 224, 224, 3), dtype=tf.float32,
+                               initializer= tf.random_normal_initializer(mean=0.0, stddev=0.5))
+    
+    tf.import_graph_def(net['graph_def'], name='vgg', input_map={'images:0':net_input})
+
+    layer_name = 'vgg/conv4_2/conv4_2:0'
+    gram_op = get_gram_matrix(g, layer_name)
+
+    sess.run(tf.global_variables_initializer())
+
+    s = sess.run(gram_op)
+    print(s.shape)
+
+```
 
 #### how to visualizing pretrained model's filters
 why we visualize filters? in order to know what filters do.
@@ -464,6 +575,10 @@ author says, we use a forward pass up to the layer that we are interested in, an
 so author says, we will find the max neurons of activation in that layer, and to see what pixel works for by using gradient of max value with respect to image. actually for this max value, all pixels of image are contribute. 
 but what this will look like?
 
+#### pretrained model resources
+```
+http://www.vlfeat.org/matconvnet/pretrained/#downloading-the-pre-trained-models
+```
 #### how to understand the process of learning a new language
 1. A new language is actually a new expression which that new interpretor can understand. 
 2. every language basically has its own power toolkits, this is the reason why it get people involved, except C language. but C is flexiable and extendable, just need developer take care of everything they will use. but for other language, they have tools, just find it and use the best of them.
@@ -486,4 +601,4 @@ but what this will look like?
 2. how to save list, array or something else, and load them when needed.
 3. how to split the whole process into sub steps, and every steps are indepent.
 4. make sess4.py work using placeholder. currently it use interactiveSession works, but how to convert to normal process, you need enfort to work on it. [this is the learning rules, get chanlge and resolve it, you will improve. this process is not easy, but full of excitement. in contrast, leave or run away when chanle happens, you will always walk around the shallow water, never can be able to dive into the essentials.]
-
+5. https://nthu-datalab.github.io/ml/labs/12-2_Visualization_and_Style_Transfer/12-2_Visualization_and_Style_Transfer.html
