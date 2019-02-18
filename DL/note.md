@@ -293,6 +293,25 @@ or even for generating new data.
 * t.eval() is a shortcut for calling `tf.get_default_session().run(t)`
 so in `sess.run(op, feed_dict={})` =>`op.eval(feed_dict={})`
 
+* GAN, generative adversarial network. it is actually two networks. one called the generator, and another called the discriminator. The basic idea is the generator is trying to create tlhings which look like the training data. so for images, more images that look like the training data. the discriminator has to guess whether what its given is a real training example. or whether its output of the generator. 
+by training one after another, you ensure neither are ever too strong, but both grow stronger together. the discriminator is also learning a distance function! this is pretty cool because we no longer need to measure pixel-based distance, but we learn the distance function entirely!
+if we finally get this distance function, we can store this function and all params, for a new image, we don't need to compute distance, instead, we get code from generator, and then plug into the distance function, we get what we expect. so pretty cool!
+
+* recurrent neural network, let us reason about information over multiple timesteps.
+they are able to encode what it has seen it the past as if it has a memory of its own. 
+it doesn this by basically creating one HUGE network that expands over time. 
+it can reason about the current timestep by conditioning on what it has already seen.
+by giving it many sequences as batches, it can learn a distribution over sequences which can
+model the current timestep given the previous timesteps.
+
+1. a huge network
+2. remember past timesteps 
+3. reason about the current timestep.
+
+* VSM, vector space model. two distribution method: count-based method and predictive model.
+for predictive mode, there are two implementations, CBOW, predicts target word from context(predict 'mat', from 'a cat sit on the '); skip-gram, predicts context words from the target words.
+for most part, it turns out skip-gram is a useful method for larger dataset.
+
 ### how to undertand default session and default graph
 ```
 graph1 = tf.Graph()
@@ -418,6 +437,10 @@ plt.suptitle('name and value')
 plt.show()
 ```
 
+#### how to save plot
+```
+plt.savefig("xx.png")
+```
 ### why these three curve works for learning
 this curve actually regulate output Y_pred value. so that learning operation works.
 so sigmoid always output -1, 1 output, while relu output 0 and 1, can be work as the yes or no classification.
@@ -478,6 +501,15 @@ enumerate is useful for obtaining an indexed list: (0, seq[0]), (1, seq[1]), (2,
 1. list[::-1] change from [1, 2, 3, 4] to [4, 3, 2, 12]
 2. list[::2] change from [1, 2, 3, 4] to [1, 3] => even index
 3. list appends: list.append(value) or list = list + [value]
+
+#### python zip
+zip: tuple
+```
+vocab = list(set(txt)) # len(vocab) is all character number in txt, len(txt) is text file length.
+encoder = dict(zip(vocab, range(len(vocab)))) # 'v':76 return tuple pair
+decoder = dict(zip(range(len(vocab)), vocab))
+
+```
 
 #### how to load pretrained network
 ```
