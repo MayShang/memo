@@ -70,6 +70,27 @@ if our data does not end up looking like this, then we should either
 there are other options that one could explore, including different types of normalization such as local contrast normalization for images
 or PCA based normalization.
 
+another explaination:
+it's simply a case of getting all data on the same scale: if the scales for different features are widely different, this can have a knock-on effect on you ability to learn.
+
+and from wiki: feature scaling
+standardize the range of independent variables or features of data. in data processing, it is also known as data normalization and is generally performed during the data preprocessing step.
+
+gradient descent converges much faster with feature scaling than without it.
+* rescaling (min-max normalization), the simplest method and rescaling the range to [0, 1] or [-1, 1], x' = (x - min(x)) / (max(x) - min(x))
+* mean normalization, x' = (x - averaage(x)) / (max(x) - min(x))
+* standardization, x' = (x - mean(x)) / std(x)
+standard deviatrion, sqrt(sum(square(x)/n))
+* scaling to unit length, x' = x / ||x||, to scale the components of a feature vector such that the complete vector has length one. this usually means dividing each component by the Euclidean length of the vector. 
+
+* variance, the average of the squared differences from the Mean.
+`www.mathsisfun.com/data/standard-deviation.html`
+standard Deviation, distances from the mean, sqrt(sum(square(x-mean(x)))/n), [mean-sd, mean+sd]
+mean squared error, distances from the real value, sqrt(sum(square(x-x'))/n)
+
+* `tf.random_unifrom`, uniform distribution, is a distribution that has constant probability.
+* `tf.random_normal`, bell curve
+
 ### how we can convert `batch x W x H x channels` 4d array into image original dimension array
 ```
 flattened = data.ravel()
@@ -91,7 +112,7 @@ so if image is tensor, need to convert to np.array by `tensor.eval(session=sess)
 
 3. imshow(imgdata)   
 imgdata is (H, W, C)
-if imagedata shape is (HxW, C)  
+ if imagedata shape is (HxW, C)  
 
 ```
 plt.imshow(imgdata.reshape([H, W, C])) # imgdata is numpy.array, who has reshape() method
@@ -627,6 +648,69 @@ http://www.vlfeat.org/matconvnet/pretrained/#downloading-the-pre-trained-models
 7. make the total_loss, `alpha * content_loss + beta * style_loss`, and optimizer
 7. train
 
+## word2vec
+### reference
+search `mccormickml` and 'applying word2vec'
+
+
+### how to understand word2vec batch
+this batch generator uses gram-skip method. meaning, predict context from target words.
+1. we have a data pool, every epoch we have a bunch of batch data to train. 
+2. for each batch, we have a skip window, skip window is left and right word of target word. skip window has a span = 2 * skip_windwo +1 => [skip_window target skip_window]
+3. num_skips means how many times each word will be used. 
+4. for batch, we have batch/num_skips pairs of target and context. list batch[] correspond to target word, labels[] to context word.
+```
+data = [195, 2, 3134, 46, 56]
+
+batch = [2,   2,    3134, 3134, 46,    46, 56, 56]
+labels= [195, 3134, 46,   2,    3134,  56, 46, x ]
+```
+implementation
+```
+    data_index = 4
+    assert batch_size % num_skips == 0
+    assert num_skips <= 2 * skip_window
+    batch = np.ndarray(shape=(batch_size), dtype=np.int32)
+    labels = np.ndarray(shape=(batch_size, 1), dtype=np.int32)
+    span = 2 * skip_window + 1  # [ skip_window target skip_window ]
+    buffer = collections.deque(maxlen=span)  # pylint: disable=redefined-builtin
+    if data_index + span > len(data):
+      data_index = 0
+    buffer.extend(data[data_index:data_index + span])
+    data_index += span
+    for i in range(batch_size // num_skips):
+      context_words = [w for w in range(span) if w != skip_window]
+      words_to_use = random.sample(context_words, num_skips)
+      for j, context_word in enumerate(words_to_use):
+        batch[i * num_skips + j] = buffer[skip_window]
+        labels[i * num_skips + j, 0] = buffer[context_word]
+      if data_index == len(data):
+        buffer.extend(data[0:span])
+        data_index = span
+      else:
+        buffer.append(data[data_index])
+        data_index += 1
+    # Backtrack a little bit to avoid skipping words in the end of a batch
+    data_index = (data_index + len(data) - span) % len(data)
+```
+### mccormickml note
+1. we are going to train a simple nn with a single hidden layer to perform a certain task, but then we are not actually going to use that nn for the task we trained it on! instead, the goal is actually just to learn the weights of the hidden layer - then these weights are actually the 'word vectors'.
+so now embeddings are the params we're trying to learn. we use these word vectors. 
+
+2. given a specific word in the middle of a sentence(the input word), look at the words nearby and pick one at random. the network is going to tell us the probability for every word in our vocabulary of being the 'nearby word' the we chose. ( comm: we get one word in the middle of a sentence, predict the nearby words. send this input word to network, it will give us the probability of all vocabulary to be this input word 'nearby word' )
+3. how to train this network. we train this network by feeding it word pairs found in our training documents. when training finished, if you give the word 'xx' as input, then it will output a much higher probability for some pair than rest pairs. 
+4. we are going to learn word vectors with 300 features. 
+so the hidden layer weight matrix is [10000, 300], input one word vector [1, 10000]
+so [1, 10000] \* [10000, 300] = [1, 300] 
+and the end goal of all of this is really just to learn this hidden layer weight matrix.
+5. the [1, 300] word vector is one word features vector, then fed to the output layer. which is a softmax regression classifier. it will produce an oputput between 0 and 1, and the sum of all these output values will add up to 1. 
+6. about the output layer. word vector will be sent to output layer, and more over, each output neuron has a weight vector [300, 1] feature, weight vector. this weight vector is learned.
+so in summary, this network is simply but large. one hidden layer, we need this hidden layer weights matix. and what about the output neuron weight vector? we feed one hot encoded word, calculate weight to yeild feature vector, then this vector go to 10000 neuron's softmax to get probability over 10000. 
+
+7. what is cosine similarity. it tends to be useful when trying to determine how similar two texts/documents are. Cosine similarity works, because we ignore magnitude and focus solely on orientation.o
+let's say we have 2 vectors, each representing a sentence. if the two vectors are close to parallel, maybe we assume that both sentences are 'similar' in theme. 
+np.dot(A, B) similar to cosine theta, if cosine theta = 1, means A and B are the same orientation, and they are similar.
+
 
 # todo
 1. how to debug python
@@ -634,3 +718,5 @@ http://www.vlfeat.org/matconvnet/pretrained/#downloading-the-pre-trained-models
 3. how to split the whole process into sub steps, and every steps are indepent.
 4. make sess4.py work using placeholder. currently it use interactiveSession works, but how to convert to normal process, you need enfort to work on it. [this is the learning rules, get chanlge and resolve it, you will improve. this process is not easy, but full of excitement. in contrast, leave or run away when chanle happens, you will always walk around the shallow water, never can be able to dive into the essentials.]
 5. https://nthu-datalab.github.io/ml/labs/12-2_Visualization_and_Style_Transfer/12-2_Visualization_and_Style_Transfer.html
+
+
