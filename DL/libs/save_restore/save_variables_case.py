@@ -76,7 +76,43 @@ def restore_variables():
         print("v1: %s" % v1.eval())
         print("v2: %s" % v2.eval())
 
+def save_variables_part():
+    #create some variables.
+    v1 = tf.get_variable('v1', shape=[3], initializer=tf.zeros_initializer)
+    v2 = tf.get_variable('v2', shape=[5], initializer=tf.zeros_initializer)
+
+    inc_v1 = v1.assign(v1 + 1)
+    dec_v2 = v2.assign(v2 - 1)
+
+    # op to initialize the variables
+    init_op = tf.global_variables_initializer()
+
+    # create saver to save and restore all the variables
+    saver = tf.train.Saver({'v2': v2})
+
+    with tf.Session() as sess:
+        sess.run(init_op)
+        sess.run(inc_v1)
+        sess.run(dec_v2)
+
+        save_path = saver.save(sess, './save_variables/model_part.ckpt')
+        print('model saved in path: %s' % save_path)
+
+def restore_variables_part():
+    tf.reset_default_graph()
+    v1 = tf.get_variable("v1", shape=[3])
+    v2 = tf.get_variable("v2", shape=[5])
+
+    saver = tf.train.Saver()
+
+    with tf.Session() as sess:
+        saver.restore(sess, './save_variables/model_part.ckpt')
+        print('model restored.')
+        print("v1: %s" % v1.eval())
+        print("v2: %s" % v2.eval())
+
 
 if __name__ == '__main__':
     # save_variables()
-    restore_variables()
+    # restore_variables()
+    save_variables_part()

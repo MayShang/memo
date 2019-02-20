@@ -647,6 +647,58 @@ feed_dict = {w1: 13}
 op_to_restore = g.get_tensor_by_name('op_to_restore:0')
 print(sess.run(op_to_restore, feed_dict))
 ```
+#### inspect variables in a checkpoint
+```
+\#import the inspect_checkpoint library
+from tensorflow.python.tools import inspect_checkpoint as chkp
+
+# print all tensors in checkpoint file
+chkp.print_tensors_in_checkpoint_file("/tmp/model.ckpt", tensor_name='', all_tensors=True)
+
+# tensor_name:  v1
+# [ 1.  1.  1. ]
+# tensor_name:  v2
+# [-1. -1. -1. -1. -1.]
+
+# print only tensor v1 in checkpoint file
+chkp.print_tensors_in_checkpoint_file("/tmp/model.ckpt", tensor_name='v1', all_tensors=False)
+
+# tensor_name:  v1
+# [ 1.  1.  1. ]
+
+# print only tensor v2 in checkpoint file
+chkp.print_tensors_in_checkpoint_file("/tmp/model.ckpt", tensor_name='v2', all_tensors=False)
+
+# tensor_name:  v2
+# [-1. -1. -1. -1. -1.]
+```
+
+### how to save and restore models
+use `SaveModel`to save and load your model, model includes variables, graph, and the graph's metadata.
+the saveModel will load in tensorflow serving and support the predict API. to use the classify, regress, or multiInference APIs.
+SaveMode apis to support above.
+if you need more custom behavior, you'll need to use the SaveModelBuilder.
+
+#### features in SaveModel
+1. multiple graphs sharing a single set of variables and assets can be added to a single SaveModel. Each graph is associated with a specific set of tags to identification during a load or restore operation.
+2. support for SignatureDefs
+  * Graph that are used for inference tasks typically have a set of inputs and outputs. this is called a `Signature`.
+  * SaveModel uses `SignatureDefs` to allow generic support for signatures that may need to be saved with the graphs.
+  * how to use SignatureDef？
+3. support for Assets
+  * for cases where ops depend on external files for initialization, such as vocabularies, SaveModel supports this via assets.
+  * assets are copied to the SaveModel location and can be read when loading a specific meta graph def.
+4. support to clear devices before generating the SaveModel.
+
+#### SaveModel
+SaveModel manages and builds upon existing Tf primitives such as Tf Saver and MetaDef. The Saver is primarily used to generate the variable checkpoint.
+#### SaveModel Components
+1. SaveModel protocol buffer: `saved_model.pb` or `saved_model.pbtxt`, the graph definitions as `MetaGraphDef` protocol buffers.
+2. Assets
+3. extra assets
+4. Variables, subfolder called 'variables' and Saver output `variables.data-??-of-???`
+
+
 
 #### how to understand the process of learning a new language
 1. A new language is actually a new expression which that new interpretor can understand. 
@@ -749,7 +801,8 @@ for tf,
 # todo
 1. how to debug python
 2. how to save list, array or something else, and load them when needed.
-3. how to split the whole process into sub steps, and every steps are indepent.
-4. make sess4.py work using placeholder. currently it use interactiveSession works, but how to convert to normal process, you need enfort to work on it. [this is the learning rules, get chanlge and resolve it, you will improve. this process is not easy, but full of excitement. in contrast, leave or run away when chanle happens, you will always walk around the shallow water, never can be able to dive into the essentials.]
-5. https://nthu-datalab.github.io/ml/labs/12-2_Visualization_and_Style_Transfer/12-2_Visualization_and_Style_Transfer.html
 
+6. learn tf serving,
+https://www.tensorflow.org/serving/serving_basic
+https://medium.com/epigramai/tensorflow-serving-101-pt-1-a79726f7c103
+https://medium.freecodecamp.org/how-to-deploy-tensorflow-models-to-production-using-tf-serving-4b4b78d41700
