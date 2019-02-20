@@ -632,6 +632,22 @@ but what this will look like?
 ```
 http://www.vlfeat.org/matconvnet/pretrained/#downloading-the-pre-trained-models
 ```
+
+### save and restore models
+#### restore
+```
+sess = tf.Session()
+\#load meta graph and restore ckpt
+saver = tf.train.import_meta_graph('./../xx.meta')
+saver.restore(sess, tf.train.latest_checkpoint('./../'))
+print(sess.run('b1:0')) # Variables can be access directly
+g = tf.get_default_graph()
+w1 = g.get_tensor_by_name('w1:0') # placeholder
+feed_dict = {w1: 13}
+op_to_restore = g.get_tensor_by_name('op_to_restore:0')
+print(sess.run(op_to_restore, feed_dict))
+```
+
 #### how to understand the process of learning a new language
 1. A new language is actually a new expression which that new interpretor can understand. 
 2. every language basically has its own power toolkits, this is the reason why it get people involved, except C language. but C is flexiable and extendable, just need developer take care of everything they will use. but for other language, they have tools, just find it and use the best of them.
@@ -711,6 +727,24 @@ so in summary, this network is simply but large. one hidden layer, we need this 
 let's say we have 2 vectors, each representing a sentence. if the two vectors are close to parallel, maybe we assume that both sentences are 'similar' in theme. 
 np.dot(A, B) similar to cosine theta, if cosine theta = 1, means A and B are the same orientation, and they are similar.
 
+## how to understand np and tf random
+### random seed
+`np.random.seed(0)` makes the random numbers predictable
+```
+np.random.seed(0)
+np.random.rand(4) # => array([0.55, 0.72, 0.6, 0.54])
+np.random.seed(0)
+np.random.rand(4) # => array([0.55, 0.72, 0.6, 0.54])
+```
+with the seed reset every time, the same set of numbers will appear every time.
+if not, different numbers appear with every invocation:
+```
+np.random.rand(4) # => array([0.42, 0.65, 0.4, 0.89])
+np.random.rand(4) # => array([0.96, 0.38, 0.79, 0.53])
+```
+for tf, 
+`a = tf.random_uniform([1], seed=1)` # op level seed reset
+`tf.set_random_seed(1)`              # graph level seed reset
 
 # todo
 1. how to debug python
@@ -718,5 +752,4 @@ np.dot(A, B) similar to cosine theta, if cosine theta = 1, means A and B are the
 3. how to split the whole process into sub steps, and every steps are indepent.
 4. make sess4.py work using placeholder. currently it use interactiveSession works, but how to convert to normal process, you need enfort to work on it. [this is the learning rules, get chanlge and resolve it, you will improve. this process is not easy, but full of excitement. in contrast, leave or run away when chanle happens, you will always walk around the shallow water, never can be able to dive into the essentials.]
 5. https://nthu-datalab.github.io/ml/labs/12-2_Visualization_and_Style_Transfer/12-2_Visualization_and_Style_Transfer.html
-
 
