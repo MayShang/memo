@@ -698,7 +698,30 @@ SaveModel manages and builds upon existing Tf primitives such as Tf Saver and Me
 3. extra assets
 4. Variables, subfolder called 'variables' and Saver output `variables.data-??-of-???`
 
+* you will have one service per model and you can run different services on different hardware. this is tf serving ModelServer is doing for you. so don't go wrap an API around your python code(where you've probably imported the entire tf library, tf.contrib, opencv, pandas, numpy, ...) tf Serving ModelServer does that for you.
+* how to save the moder using SaveModel
+  * first we have to grab the input and output tensors.
+  * create a signature definition from the input and output tensors.The signature definition is what the model builder use in order to save something a model server can load.
+  * save the model at a specific path where a server can load it from.
+  * refer to `https://github.com/epigramai/tfserving-simple-example.git` and
+`https://medium.com/epigramai/tensorflow-serving-101-pt-1-a79726f7c103`
 
+#### understand serving life-cycle
+1. the serving life-cycle starts when serving identifies a model on disk.
+2. the Source component takes care of that. it is responsible for identifying new models that should be loaded. In practice, it keeps an eye on the file system to identify when a new model version arrives to the disk. when it sees a new version, it processds by creating a Loader for the specific version of the model.
+3. the Loader knows almost everything about the model. It includes how to load it and how to estimate the model's required resources, such as the requested RAM and GPU memory. The loader has a pointer to the model on disk along with all the necessary meta-data for loading it. but there is a catch here: the Loader itself is not allowed to load the model just yet.
+4. after creating the Loader, the Source sends it to the Manager as an Aspired Version.
+5. the manager, upon receiving the model's aspired version, it proceeds with the serving process.here there are two possibilities. one is that the first model version is pushed for deployment. in this situation, the manager will make sure that the required resources are available. once they are, the manager gives the loader permission to load the model. The second is that we are pushing a new version of an existing model. in this case, the Manager has to consult the Version Policy plugin before going further. the version policy determines how the process of loading a new model versin take place.
+6. at the end, when a client requests a handle for the model, the manager returns a handle to the Servable.
+
+#### how to understand SignatureDef
+1. Classification, Predict, and Regression. For the Classification signature, there must be an inputs tensor and at least one of two possible output tensors: classes and/ or scores. The Regression SignatureDef requires exactly one tensor for input and another for output. The Predict allows for a dynamic number of input and output tensors.
+2. refer to
+`https://medium.freecodecamp.org/how-to-deploy-tensorflow-models-to-production-using-tf-serving-4b4b78d41700`
+
+#### tf serving pipeline
+use to analysis data, performance and so on, it running on cpu or GPU
+but what is different from the graph exporting, why so much more ways to export models. And what are them, how to use and choose better to use.
 
 #### how to understand the process of learning a new language
 1. A new language is actually a new expression which that new interpretor can understand. 
@@ -798,11 +821,48 @@ for tf,
 `a = tf.random_uniform([1], seed=1)` # op level seed reset
 `tf.set_random_seed(1)`              # graph level seed reset
 
+## Docker
+### docker cheat sheet
+```
+docker
+docker container --help
+
+docker --version
+docker info
+
+docker run hello-world
+
+docker image ls
+
+docker container ls
+docker container ls --all
+docker container ls -aq
+```
+
+### docker build image
+1. three file: Dockerfile, app.py, requirements.txt
+2. `pip3 install -r requirements.txt` 
+3. `docker build --tag=imagename:v0.0.2 .`
+4. `docker image ls`
+5. `docker run -p 4000:80 imagename:v0.0.2`
+6. `docker container ls`
+7. `docker container stop CONTAINER ID`
+8. `docker image rm ID`
+
 # todo
 1. how to debug python
-2. how to save list, array or something else, and load them when needed.
 
 6. learn tf serving,
 https://www.tensorflow.org/serving/serving_basic
-https://medium.com/epigramai/tensorflow-serving-101-pt-1-a79726f7c103
-https://medium.freecodecamp.org/how-to-deploy-tensorflow-models-to-production-using-tf-serving-4b4b78d41700
+
+7. Docker[1, 2 done, 3, 4, 5 todo]
+8. perform one serving whole process
+9. serving pipeline
+10. tf lite pretrained model
+  * application
+  * how to retrain
+11. regarding pretrained model
+  * how to load, use and detect etc. basic concept, better to have a summary
+  * how to continue training
+  * how to export
+
