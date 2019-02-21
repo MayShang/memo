@@ -866,3 +866,10 @@ https://www.tensorflow.org/serving/serving_basic
   * how to continue training
   * how to export
 
+12. read
+https://cv-tricks.com/tensorflow-tutorial/save-restore-tensorflow-models-quick-complete-tutorial/
+https://cv-tricks.com/tensorflow-tutorial/training-convolutional-neural-network-for-image-classification/
+https://cv-tricks.com/artificial-intelligence/deep-learning/deep-learning-frameworks/tensorflow/tensorflow-tutorial/
+https://cv-tricks.com/how-to/freeze-tensorflow-models/
+https://www.tensorflow.org/guide/extend/model_files
+https://blog.metaflow.fr/tensorflow-how-to-freeze-a-model-and-serve-it-with-a-python-api-d4f3596b3adc
