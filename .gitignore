@@ -1,4 +1,5 @@
-DL/libs/save_restore/save_variable
+DL/libs/save_restore/save_variables
+DL/libs/save_restore/save_test
 DL/libs/save_restore/save_func
 DL/libs/save_restore/simple
 

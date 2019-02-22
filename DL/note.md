@@ -723,6 +723,30 @@ SaveModel manages and builds upon existing Tf primitives such as Tf Saver and Me
 use to analysis data, performance and so on, it running on cpu or GPU
 but what is different from the graph exporting, why so much more ways to export models. And what are them, how to use and choose better to use.
 
+## frozen graph def
+frozen graph def is a single encapsulated file (.pb). it essentially a serialized graph_def protocol buffer written to disk.
+
+### how we freeze the trained model
+reference `https://github.com/sankit1/cv-tricks.com.git`
+reference `https://github.com/MindorksOpenSource/AndroidTensorFlowMNISTExample.git`
+
+### what is the difference between graph and graph_def
+graph is core concept of tf, you create your own graph and pass it to tf. in addition, tf support different front programming languages, python, c java etc, how the other languages transform the graph to c, they use a tool called `protobuf` which can generate specific language stubs, that's where the `graphdef` come from. it's a serialized version of Graph.
+
+```
+import tensorflow as tf
+from tensorflow.python.platform import gfile
+with tf.Session() as sess:
+    model_filename ='PATH_TO_PB.pb'
+    with gfile.FastGFile(model_filename, 'rb') as f:
+        graph_def = tf.GraphDef()
+        graph_def.ParseFromString(f.read())
+        g_in = tf.import_graph_def(graph_def)
+LOGDIR='/logs/tests/1/'
+train_writer = tf.summary.FileWriter(LOGDIR)
+train_writer.add_graph(sess.graph)
+```
+
 #### how to understand the process of learning a new language
 1. A new language is actually a new expression which that new interpretor can understand. 
 2. every language basically has its own power toolkits, this is the reason why it get people involved, except C language. but C is flexiable and extendable, just need developer take care of everything they will use. but for other language, they have tools, just find it and use the best of them.
@@ -849,22 +873,27 @@ docker container ls -aq
 7. `docker container stop CONTAINER ID`
 8. `docker image rm ID`
 
+### docker for deploy
+docker work logic is based on server, and we can build image with all services, so this is the contents of the rest of docker tutorial. 
+and if we have a docker, webserver using all components will become really easy.
+continue reading docker tutorial docs. actually all of them are beautiful system.
+
 # todo
 1. how to debug python
 
 6. learn tf serving,
 https://www.tensorflow.org/serving/serving_basic
 
-7. Docker[1, 2 done, 3, 4, 5 todo]
-8. perform one serving whole process
-9. serving pipeline
+7. [Done] Docker[1, 2 done, 3, 4, 5 todo]
+8. [Delay] perform one serving whole process
+9. [Delay] serving pipeline
 10. tf lite pretrained model
   * application
   * how to retrain
 11. regarding pretrained model
-  * how to load, use and detect etc. basic concept, better to have a summary
-  * how to continue training
-  * how to export
+  * [Doing] how to load, use and detect etc. basic concept, better to have a summary
+  * [] how to continue training
+  * [] how to export
 
 12. read
 https://cv-tricks.com/tensorflow-tutorial/save-restore-tensorflow-models-quick-complete-tutorial/
