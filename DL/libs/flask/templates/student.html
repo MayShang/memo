@@ -1,0 +1,22 @@
+<html>
+    <head></head>
+    <body>
+        <p> enter you data </p>
+        <form action = "/save_cookie" method="post">
+            <p> id <input type = "text" name = "usr_id" /> </p>
+            <p> math <input type = "text" name = "math" /> </p>
+            <p> history <input type = "text" name = "history"/> </p>
+            {#<input type = "submit" value="submit"/>#}
+        </form>
+
+        <div>
+            <h3> upload your file </h3>
+            <form action = "/upload_file" method = "post"
+                enctype = "multipart/form-data">
+                <p> choose ... <input type = "file" name = "file" /> </p>
+                <input type = "submit" value = "submit" />
+            </form>
+        </div>
+
+    </body>
+</html>
