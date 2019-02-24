@@ -161,9 +161,9 @@ def restore_variables_part():
 
 if __name__ == '__main__':
     # save_variables()
-    # restore_variables()
+    restore_variables()
     # save_variables_part()
     # save_model()
     # save_pb()
-    load_pb()
+    # load_pb()
     # restore_model()

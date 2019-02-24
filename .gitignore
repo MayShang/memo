@@ -2,4 +2,5 @@ DL/libs/save_restore/save_variables
 DL/libs/save_restore/save_test
 DL/libs/save_restore/save_func
 DL/libs/save_restore/simple
-
+DL/libs/save_restore/MNIST_data
+DL/libs/flask/__pycache__

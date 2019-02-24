@@ -679,6 +679,12 @@ feed_dict = {w1: 13}
 op_to_restore = g.get_tensor_by_name('op_to_restore:0')
 print(sess.run(op_to_restore, feed_dict))
 ```
+`meta` holding graph and all its metadata
+`data` holding weights
+when we serve a model in production, we don't need meta or data, ckpt, we need one file `pb`
+
+PS: if don't need to get variables, just continue training, only saver.restore(sess, ckpt).refer to `save_func.py`
+
 #### inspect variables in a checkpoint
 ```
 \#import the inspect_checkpoint library
@@ -705,11 +711,18 @@ chkp.print_tensors_in_checkpoint_file("/tmp/model.ckpt", tensor_name='v2', all_t
 # [-1. -1. -1. -1. -1.]
 ```
 
+
 ### how to save and restore models
 use `SaveModel`to save and load your model, model includes variables, graph, and the graph's metadata.
 the saveModel will load in tensorflow serving and support the predict API. to use the classify, regress, or multiInference APIs.
 SaveMode apis to support above.
 if you need more custom behavior, you'll need to use the SaveModelBuilder.
+
+#### the model has two main files
+1. meta graph, it's a protocol buffer which saves the complete graph: i.e. all variables, operations, collections etc. this file has `.meta` surfix.
+2. checkpoint file, binary file contains all the values of the weights, bias, gradients and all other variables saved.
+3. a file named checkpoint which simply keeps a record of latest checkpoint files saved.
+
 
 #### features in SaveModel
 1. multiple graphs sharing a single set of variables and assets can be added to a single SaveModel. Each graph is associated with a specific set of tags to identification during a load or restore operation.
@@ -761,6 +774,7 @@ frozen graph def is a single encapsulated file (.pb). it essentially a serialize
 ### how we freeze the trained model
 reference `https://github.com/sankit1/cv-tricks.com.git`
 reference `https://github.com/MindorksOpenSource/AndroidTensorFlowMNISTExample.git`
+https://blog.metaflow.fr/tensorflow-how-to-freeze-a-model-and-serve-it-with-a-python-api-d4f3596b3adc
 
 ### what is the difference between graph and graph_def
 graph is core concept of tf, you create your own graph and pass it to tf. in addition, tf support different front programming languages, python, c java etc, how the other languages transform the graph to c, they use a tool called `protobuf` which can generate specific language stubs, that's where the `graphdef` come from. it's a serialized version of Graph.
@@ -910,6 +924,10 @@ docker work logic is based on server, and we can build image with all services, 
 and if we have a docker, webserver using all components will become really easy.
 continue reading docker tutorial docs. actually all of them are beautiful system.
 
+## models
+### image classification
+https://cv-tricks.com/tensorflow-tutorial/training-convolutional-neural-network-for-image-classification/
+
 # todo
 1. how to debug python
 
@@ -928,12 +946,49 @@ https://www.tensorflow.org/serving/serving_basic
   * [] how to export
 
 12. read
-https://cv-tricks.com/tensorflow-tutorial/save-restore-tensorflow-models-quick-complete-tutorial/
 https://cv-tricks.com/tensorflow-tutorial/training-convolutional-neural-network-for-image-classification/
-https://cv-tricks.com/artificial-intelligence/deep-learning/deep-learning-frameworks/tensorflow/tensorflow-tutorial/
-https://cv-tricks.com/how-to/freeze-tensorflow-models/
 https://www.tensorflow.org/guide/extend/model_files
 https://blog.metaflow.fr/tensorflow-how-to-freeze-a-model-and-serve-it-with-a-python-api-d4f3596b3adc
 
 ## flask docker webserver
 reference: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world
+
+## Ajax
+ajax means async js and xml, it is a technique for accessing web server from a web page.
+
+## ML files arch
+Think about what you will probably have to do when you will be doing ML codeing perspective:
+1. you will have to code a model
+2. this model will have at least two different stages: training stage and inferring stage (production)
+3. you will have to feed a dataset to this model(training stage)
+4. you might have to feed it single elements too (inferring stage)
+5. you will have to tune its hyper-parameters
+6. to tune them you will have to make you model configurable and create a kind of API, at least an endpoint where you can push a configuration.
+7. you will need a nice folder architecture for training result (so you can skim through it and remember each experiment essily)
+8. you will need to graph some metrics like the loss or accuracy (in training and production stage)
+9. youj want those graphs to be easily searchable out of the box
+10. you want to be able to replicate any experiment you do
+11. you might even want to be able to jump back in time in the training stage to check your model a posteriori.
+.
+|- .gitignore
+|- README
+|- data
+|  |- download.sh
+|- hpsearch
+|  |- hyperband.py
+|  |- randomsearch.py
+|- main.py
+|- models
+|  |- __init__.py
+|  |- basic_model.py
+|- results
+|  |- .gitkeep
+|- tests
+* README: take some time and write a good markdown with at least those sections: "Installation", "Usage", "Test", "Useful Links" for any too heavy files to put directly into your repository.
+* main.py:
+* data folder: make you script prepare the folder nicely if needed, for example, the script can create the train/val/test sub-folder if they don't exist.
+* model folder:
+* __init__file: it's a python helper to make your models more accessible and simplify the potential complexity of the model's folder.
+* basic_model.py: most of the models can share a common architecture.
+* hpsearch folder: contain any helpers for doing custom hyper-parameters search. keep those functions pure and sparated so you can test them easily.
+
