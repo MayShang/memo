@@ -378,6 +378,9 @@ so what the rules to assign session and graph in training learning.
 
 ### what are the rules of design session and graph
 
+### how to understand `softmax` and "softmax_cross_entroy_with_logics"
+https://stackoverflow.com/questions/34240703/what-is-logits-softmax-and-softmax-cross-entropy-with-logits
+
 
 # pyplot basic operation
 ## example1
@@ -680,7 +683,7 @@ op_to_restore = g.get_tensor_by_name('op_to_restore:0')
 print(sess.run(op_to_restore, feed_dict))
 ```
 `meta` holding graph and all its metadata
-`data` holding weights
+`data` holding weights[?]
 when we serve a model in production, we don't need meta or data, ckpt, we need one file `pb`
 
 PS: if don't need to get variables, just continue training, only saver.restore(sess, ckpt).refer to `save_func.py`
@@ -722,6 +725,7 @@ if you need more custom behavior, you'll need to use the SaveModelBuilder.
 1. meta graph, it's a protocol buffer which saves the complete graph: i.e. all variables, operations, collections etc. this file has `.meta` surfix.
 2. checkpoint file, binary file contains all the values of the weights, bias, gradients and all other variables saved.
 3. a file named checkpoint which simply keeps a record of latest checkpoint files saved.
+4. reference: https://www.tensorflow.org/guide/extend/model_files
 
 
 #### features in SaveModel
@@ -928,6 +932,39 @@ continue reading docker tutorial docs. actually all of them are beautiful system
 ### image classification
 https://cv-tricks.com/tensorflow-tutorial/training-convolutional-neural-network-for-image-classification/
 
+### how to understand the shape changes between convnet layer
+https://cv-tricks.com/tensorflow-tutorial/training-convolutional-neural-network-for-image-classification/
+says we have one convnet -> flatten -> fc1(128) -> fc2(class_num) -> softmax -> output
+1. [?, 128, 128, 3] * filter[5, 5, 32] -> maxpooling [1, 2, 2, 1] -> [?, 64, 64, 32]
+2. flattened, reshape to [?, 64*64*32]
+3. fc1, weights [64*64*32, 128], bias [128], apply relu, -> [?, 128]
+4. fc2, weights [128, 2], bias [2] -> [?, 2]
+5. y_pred = softmax(fc2)
+6. y_pred_class = tf.argmax(y_pred, axis=1)
+7. correct = tf.equal(y_pred_class, y_true_class), acc = tf.reduce_mean(tf.cast(correct, tf.float32))
+
+## basic algorithms
+### K nearest neighbour
+reference: https://medium.com/@adi.bronshtein/a-quick-introduction-to-k-nearest-neighbors-algorithm-62214cea29c7
+in summary:
+* a positive integer k is specified, along with a new sample
+* we select the k entries in our database which are closest to the new sample
+* we find the most common classification of these entries
+* this is the classification we give to the new sample
+app: credit ratings, collecting financial characteristics vs. comparing people with similar financial features to a database. by the very nature of a credit rating, people who have similar financial details would be given similar credit ratings. therefore, they would like to be able to use this existing database to predict a new customer's credit rating, without having to perform all the calculations.
+
+#### code
+reference Tensorflow-Example nearest neighbour implementation.
+understanding: calculate distance between sample vector and database vector, get the mini distance idex, plug this index into Y_true to infer prediction. if what to wonder accuracy, compare if Y_true[index] and test[i] equal.
+
+how to get the mini distance?  
+says databases [?, 784], a row of it is [784] vector
+our sample vector is [784] vector, abs(Xdata_i - Xsamp_i), this is one element sub value, tf.sum(allelements) => get one distance. 
+then for all the rows, calc all distances. tf.agr_min(distances, 0)
+
+### random forest 
+reference: https://dataaspirant.com/2017/05/22/random-forest-algorithm-machine-learing/
+
 # todo
 1. how to debug python
 
@@ -941,14 +978,14 @@ https://www.tensorflow.org/serving/serving_basic
   * application
   * how to retrain
 11. regarding pretrained model
-  * [Doing] how to load, use and detect etc. basic concept, better to have a summary
-  * [] how to continue training
-  * [] how to export
+  * [Done] how to load, use and detect etc. basic concept, better to have a summary
+  * [Done] how to continue training
+  * [Done] how to export
 
 12. read
-https://cv-tricks.com/tensorflow-tutorial/training-convolutional-neural-network-for-image-classification/
-https://www.tensorflow.org/guide/extend/model_files
 https://blog.metaflow.fr/tensorflow-how-to-freeze-a-model-and-serve-it-with-a-python-api-d4f3596b3adc
+13. read:
+https://scikit-learn.org/stable/documentation.html
 
 ## flask docker webserver
 reference: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world

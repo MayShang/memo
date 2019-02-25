@@ -66,6 +66,8 @@ def load_pb():
     with tf.gfile.GFile(pb_path, 'rb') as f:
         graph_def = tf.GraphDef()
         graph_def.ParseFromString(f.read())
+        for node in graph_def.node:
+            print(node)
 
     with tf.Graph().as_default() as g:
         # tf.import_graph_def(graph_def, input_map=None, return_elements=None, name="")
