@@ -987,6 +987,14 @@ https://blog.metaflow.fr/tensorflow-how-to-freeze-a-model-and-serve-it-with-a-py
 13. read:
 https://scikit-learn.org/stable/documentation.html
 
+14 read paper
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6069275/
+https://www.researchgate.net/publication/235642521_A_mobile_indoor_navigation_system_interface_adapted_to_vision-based_localization
+
+http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.699.7856&rep=rep1&type=pdf
+
+https://www-users.cs.umn.edu/~stergios/papers/ICRA-2011-Appearance-based-Visual-Memory.pdf
+
 ## flask docker webserver
 reference: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world
 
@@ -1028,4 +1036,6 @@ Think about what you will probably have to do when you will be doing ML codeing 
 * __init__file: it's a python helper to make your models more accessible and simplify the potential complexity of the model's folder.
 * basic_model.py: most of the models can share a common architecture.
 * hpsearch folder: contain any helpers for doing custom hyper-parameters search. keep those functions pure and sparated so you can test them easily.
+
+
 
