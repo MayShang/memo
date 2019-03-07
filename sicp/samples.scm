@@ -247,14 +247,83 @@ xxx                                    ;; this is list print method
             count
             (len-iter (cdr a) (+ 1 count)))))
 
+;;; =========================================================
 ;;; list append list
 (define (append list1 list2)
     (if (null? list1)
         list2
         (cons (car list1) (append (cdr list1) list2))))
+
 (define nil ())
 (define (reverse list-c)
+    (display list-c)
     (if (null? list-c)
         nil
-        (list (reverse (cdr list-c)) (car list-c)))) ;; wrong, todo
+        (append (reverse (cdr list-c)) (list (car list-c)))))
 (reverse one-through-four)
+
+;;; =========================================================
+;;; list generic process
+(define (scale-list items factor)
+    (if (null? items)
+        nil
+        (cons (* (car items) factor)
+            (scale-list (cdr items) factor))))
+(scale-list (list 1 2 3 4) 4)
+
+;;; =========================================================
+;;; list map, the general map takes a procedure of n arguments, together with
+;;; n lists, and applies the procedure to all the first elements
+;;; of the lists, all the second elements of the lists and so on,
+;;; return a list of the results.
+(map + (list 1 2 3) (list 40 50 60) (list 700 800 900))
+
+(map (lambda (x y) (+ x (* 2 y)))
+    (list 1 2 3)
+    (list 4 5 6))
+
+;;; =========================================================
+;;; but we can map, map takes a procedure as argument and list
+;;; as another argument, and return a list of the results
+;;; produced by applying the procedure to each element in the
+;;; list.
+(define (map proc items)
+   (if (null? items)
+        nil
+        (cons (proc (car items))
+            (map proc (cdr items)))))
+(map (lambda (x) (* x x)) (list 1 2 3 4))
+
+(define (scale-list-map items factor)
+    (map (lambda (x) (* x factor))
+        items))
+(scale-list-map (list 2 3 4) 4)
+
+;;; =========================================================
+;;; Exc 2.21
+(define (square-list items)
+    (if (null? items)
+        nil
+        (cons (* (car items) (car items))
+            (square-list (cdr items)))))
+(square-list (list 1 2 3))
+
+(define (square-list-2 items)
+    (map (lambda (x) (* x x))
+        items))
+(square-list-2 (list 1 2 3))
+
+;;; =========================================================
+;;; Exc 2.23
+(define (for-each-2 proc items) ;; warning, todo
+    (if (null? items)
+        nil
+        (cons (proc (car items))
+            (for-each-2 proc (cdr items)))))
+
+(for-each-2 (lambda (x)
+            (newline)
+            (display x))
+            (list 34 23 45))
+
+;;; =========================================================
