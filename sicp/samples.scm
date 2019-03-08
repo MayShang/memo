@@ -315,15 +315,67 @@ xxx                                    ;; this is list print method
 
 ;;; =========================================================
 ;;; Exc 2.23
+; (define (for-each-2 proc items) ;; warning, todo
+;     (if (null? items)
+;         nil
+;         (cons (proc (car items))
+;             (for-each-2 proc (cdr items)))))
+
 (define (for-each-2 proc items) ;; warning, todo
     (if (null? items)
         nil
-        (cons (proc (car items))
-            (for-each-2 proc (cdr items)))))
+        (proc (car items)))
+    ((for-each-2 proc (cdr items))))
 
-(for-each-2 (lambda (x)
-            (newline)
-            (display x))
-            (list 34 23 45))
+; (for-each-2 (lambda (x)
+;             (newline)
+;             (display x))
+;             (list 34 23 45))
 
 ;;; =========================================================
+;;; count leaves
+(define (count-leaves items)
+    (cond ((null? items) 0)
+            ((not (pair? items)) 1)
+            (else (+ (count-leaves (car items))
+                   (count-leaves (cdr items))))))
+(count-leaves one-through-four)
+
+;;; =========================================================
+;;; sequences
+;;; Q: is it different from lsit?
+;;; =========================================================
+
+;;; =========================================================
+;;; sum of square the odd leaf of a list
+(define (sum-odd-square items)
+    (cond ((null? items) 0)
+        ((not (pair? items))
+            (if (odd? items) (+ 0 items) 0))
+         (else (+ (sum-odd-square (car items))
+               (sum-odd-square (cdr items))))))
+(define list-x (cons (list 1 2 3) (list 4)))
+(sum-odd-square list-x)
+
+;;; ===========================================================================
+;;; IMPORTANT: organize program to make the signal-flow structure in the
+;;; procedures, in order to incease the concptual clarity of
+;;; the resulting code.
+;;;
+;;; how?
+;;; focus on the signal flow from one stage in the process to the next.
+;;; if we represent these signals as lists, then we use list operations to
+;;; implement the processing at each of the stages.
+;;;
+;;; IDEA: (define filter predicate sequence)
+;;; means: filter a sequence to select the elements that satify predicate
+(define (filter predicate sequence)
+    (cond ((null? sequence) nil)
+        ((predicate (car sequence))
+            (cons (car sequence)
+                (filter predicate (cdr sequence))))
+        (else (filter predicate (cdr sequence)))))
+(filter odd? (list 1 2 3 4))
+
+;;; this is surprising step, I think the following steps maybe the put predicate
+;;; into sequence. this will implment signal flow
