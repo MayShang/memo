@@ -1,3 +1,5 @@
+;;; https://mitpress.mit.edu/sites/default/files/sicp/index.html
+
 (define (factorial n)
     (fact-iter 1 1 n))
 (define (fact-iter product counter max-counter)
@@ -232,6 +234,11 @@ one-through-four
 (display xxx)                          ;; wrong
 xxx                                    ;; this is list print method
 
+(define(list-ref items n)
+    (if (= n 0)
+        (car items)
+        (list-ref (cdr items) (- n 1))))
+
 ;;; list length
 ;;; len recursive
 (define (len list-c)
@@ -245,7 +252,8 @@ xxx                                    ;; this is list print method
     (define (len-iter a count)
         (if (null? a)
             count
-            (len-iter (cdr a) (+ 1 count)))))
+            (len-iter (cdr a) (+ 1 count))))
+    (len-i list-c 0))
 
 ;;; =========================================================
 ;;; list append list
@@ -342,8 +350,30 @@ xxx                                    ;; this is list print method
 (count-leaves one-through-four)
 
 ;;; =========================================================
+;;; Exc 2.25
+(define items (list 1 3 (list 5 7) 9))
+(cdr (car (cdr (cdr items))))
+(define items (list (list 7)))
+(car (car items))
+(define items (list 1 (list 2 (list 3 (list 4 (list 5 (list 6 7)))))))
+
+;;; =========================================================
+;;; Exc 2.26
+(define x (list 1 2 3))
+(define y (list 4 5 6))
+(append x y) ; (1 2 3 4 5 6)
+(cons x y)   ; ((1 2 3) 4 5 6)
+(list x y)   ; ((1 2 3) (4 5 6))
+
+;;; =========================================================
+;;; Exc 2.27
+
+;;; =========================================================
+;;; Exc 2.28
+
+;;; =========================================================
 ;;; sequences
-;;; Q: is it different from lsit?
+;;; Q: is it different from lsit? sequence is ordered list
 ;;; =========================================================
 
 ;;; =========================================================
@@ -379,3 +409,15 @@ xxx                                    ;; this is list print method
 
 ;;; this is surprising step, I think the following steps maybe the put predicate
 ;;; into sequence. this will implment signal flow
+;;; look at accumulation, this is the pattern for apply the same pattern for the
+;;; same type component.
+;;; op can be component create, connect, delete
+(define (accumulate op initial sequence)
+    (if (null? sequence)
+        initial
+        (op (car sequence)
+            (accumulate op initial (cdr sequence)))))
+(accumulate + 0 (list 1 2 3 4))
+;;; this is the reason why we use more array than list in C, because C list is
+;;; a litter complex than C.
+(accumulate cons nil (list 1 2 3 4 5))
