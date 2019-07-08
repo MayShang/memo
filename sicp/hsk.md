@@ -559,3 +559,158 @@ runWriter (return 3 :: Writer (Sum Int) Int)
 ```
 because Writer has no Show instance, so we use `runWriter` to convert our `Writer` values to normal tuples that can be shown.
 
+```
+module WriterMonad where
+
+import Control.Monad.Writer
+
+logNumber :: Int -> Writer [String] Int
+logNumber x = writer (x, ["Got number: " ++ show x]) -- here
+
+-- or can use a do-block to do the same thing, and clearly separate the logging from the value
+logNumber2 :: Int -> Writer [String] Int
+logNumber2 x = do
+  tell ["Got number: " ++ show x]
+  return x
+
+multWithLog :: Writer [String] Int
+multWithLog = do
+  a <- logNumber 3
+  b <- logNumber 5
+  tell ["multiplying " ++ show a ++ " and " ++ show b]
+  return (a * b)
+
+main :: IO ()
+main = print $ runWriter multWithLog -- (15,["Got number: 3","Got number: 5","multiplying 3 and 5"])
+```
+
+another example
+```
+import qualified Control.Monad as M
+import qualified Control.Monad.Trans.Writer.Lazy as W
+import Data.Monoid
+
+output :: String -> W.Writer [String] ()
+output x = W.tell [x]
+
+gcd' :: Int -> Int -> W.Writer [String] Int
+gcd' a b
+  | b == 0 = do
+    output ("Finished with " ++ show a)
+    return a
+  | otherwise = do
+    output (show a ++ " mod " ++ show b ++ " = " ++ show (a `mod` b))
+    gcd' b (a `mod` b)
+
+keepSmall :: Int -> W.Writer [String] Bool
+keepSmall x
+  | x < 4 = do
+    output ("Keeping " ++ show x)
+    return True
+  | otherwise = do
+    output (show x ++ " is too large, throwing it away")
+    return False
+
+-- print $ snd $ W.runWriter $ filterM keepSmall [2, 3, 4, 9]
+--
+powerset :: [a] -> [[a]]
+powerset xs = M.filterM (\x -> [True, False]) xs
+
+binSmalls :: Int -> Int -> Either String Int
+binSmalls acc x
+  | x > 99 = Left ((show x) ++ " is too big")
+  | otherwise = Right (acc + x)
+```
+[cmt] so now why not to summary "what is Writer Monad?"
+Writer type constructor is `Writer w a`, `w` is log, but a is value
+we should have a function to apply `a` and `tell` will updata `w`.
+so application:
+```
+sumNumber :: Int -> Writer (Sum Int) Int
+sumNumber x = do
+  tell (Sum x)
+  return x
+
+sumNumber 5 >>= \x -> sumNumber x >>= \y -> sumNumber y -- WriterT (Identity (5,
+                                                                              Sum
+                                                                              {getSum
+                                                                              =
+                                                                              15}))
+logNum :: Int -> Writer [String] Int
+logNum x = do
+  tell [show x]
+  return x
+
+logNum 4 >>= \x -> logNum x >>= \y -> logNum y  -- WriterT (Identity (4, ["4",
+                                                                      "4", "4"]))
+```
+
+[tricks] print line by line for [String]
+```
+mapM\_ putStrLn $ snd $ runWriter $ logNum 4 >>= \x -> logNum x
+```
+### difference list
+1. defination
+
+difference list is similar to a normal list, only instead of being a normal
+list, it's a function that takes a list and prepends another list to it.
+normal list:           [1, 2, 3]
+difference list:       \xs -> [1, 2, 3] ++ xs
+empty difference list: \xs -> [] ++ xs
+and 
+two difference list append will be:
+```
+f `append` g = \xs -> f (g xs)
+```
+so if `f` is the function : `("dog"++)`
+`g` is func: `("meat"++)`
+then appended list will be:
+```
+\xs -> "dog" ++ ("meat" ++ xs)
+```
+
+2. encap
+```
+newtype DiffList a =
+  DiffList
+    { getDiffList :: [a] -> [a]
+    }
+
+toDiffList :: [a] -> DiffList a
+toDiffList xs = DiffList (xs ++)
+
+fromDiffList :: DiffList a -> [a]
+fromDiffList (DiffList f) = f []
+```
+how to understan `fromDiffList` `f []`?
+diff list is a function, so apply this function to empty list `[]`
+
+become monoid instance
+```
+instance Monoid (DiffList a) where
+  mempty = DiffList (\xs -> [] ++ xs)
+  (DiffList f) `mappend` (DiffList g) = DiffList (\xs -> f (g xs))
+```
+[cmt] in order to be the instance of Monoid, have to impl its basic function.
+why become monoid instanc? what is benefit?
+could behavior as the same. and we can separately think of them.
+
+```
+finalCountDown :: Int -> Writer (DiffList String) ()
+finalCountDown 0 = do
+  tell (toDiffList ["0"])
+finalCountDown x = do
+  finalCountDown (x - 1)
+  tell (toDiffList [show x])
+
+finalCountDown' :: Int -> Writer [String] ()
+finalCountDown' 0 = do
+  tell ["0"]
+finalCountDown' x = do
+  finalCountDown' (x - 1)
+  tell [show x]
+```
+```
+mapM\_ putStrLn $ fromDiffList $ snd $ runWriter (finalCount 20000)
+mapM\_ putStrLn $ snd $ runWriter (finalCount' 20000)
+```
