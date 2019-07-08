@@ -510,4 +510,52 @@ canReachIn3 start end = end `elem` in3 start
 ```
 I really like this example, this is application regarding `move`
 
+### Writer Monad
+
+#### writer monad primitive impl
+```
+isBigGang :: Int -> (Bool, String)
+isBigGang x = (x > 9, "comp to 9.")
+
+applyLog :: (a, String) -> (a -> (b, String)) -> (b, String)
+applyLog (x, log) f = let (y, newLog) = f x in (y, log ++ newLog)
+```
+should know the `f` produce `(b, String)`, not just a abtrry function working.
+how to understand this `f`?
+`f x` reprodec `(y, newLog)` then continue works on (y, log ++ newLog)
+so `f` type shoulb be `Int -> (Bool, String)`
+COOL!!
+
+```
+("tobin", "got out ") `applyLog` (\x -> (length x, "applied length. ")) `applyLog` isBigGang
+```
+
+#### more closer
+```
+applyLog' :: (Monoid m) => (a, m) -> (a -> (b, m)) -> (b, m)
+applyLog' (x, log) f = let (y, newLog) = f x in (y, log `mappend` newLog)
+
+type Food = String
+type Price = Sum Int
+
+addDrink :: Food -> (Food, Price)
+addDrink "beans" = ("milk", Sum 25)
+addDrink _ = ("beer", Sum 30)
+```
+
+#### writer defination
+1. defination
+```
+newtype Writer w a = Writer {runWriter :: (a, w)}
+
+instance (Monad w) => Monad (Writer w) where
+    return x = Writer (x, mempty)
+    (Writer (x, v)) >>= f = let (Writer (y, v')) = f x Writer (y, v `mappend` v')
+```
+2. use cases
+```
+runWriter (return 3 :: Writer String Int)
+runWriter (return 3 :: Writer (Sum Int) Int)
+```
+because Writer has no Show instance, so we use `runWriter` to convert our `Writer` values to normal tuples that can be shown.
 
