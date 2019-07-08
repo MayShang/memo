@@ -341,3 +341,173 @@ sequenceA [getLine, getLine, getLine]  -- ["her", "weri", "wer"]
 ### difference between `data` and `newtype`
 when using `newtype`, you're restricted to just one constructor with one field.
 
+
+## one practical example
+```
+type Birds = Int
+type Pole = (Birds, Birds)
+
+landLeft :: Birds -> Pole -> Pole
+landLeft n (left, right) = (left + n, right)
+
+landRight :: Birds -> Pole -> Pole
+landRight n (left, right) = (left, right + n)
+
+landLeft 3 (landRight 4 (landLeft 4 (0, 0)))
+```
+this is the lexiel transfermation.
+
+`Maybe` Impl
+```
+landLeft :: Birds -> Pole -> Maybe Pole
+landLeft n (left, right)
+    | abs ((left +n) - right) < 4 = Just (left + n, right)
+    | otherwise                   = Nothing
+
+landRight :: Birds -> Pole -> Maybe Pole
+landRight n (left, right)
+    | abs (left - (right + n)) < 4 = Just (left, right + n)
+    | otherwise                    = Nothing
+
+```
+because `Maybe` is monad, so we can use landLeft/right as monad instance directly!!
+```
+landLeft 1 (0, 0) >>= landRight 3
+return (0, 0) >>= landRight 3 >>= landLeft 2 >>= landRight 4
+```
+
+## do-block
+1. examples
+
+`case` chain
+```
+routine :: Maybe Pole
+routine = case landLeft 1 (0, 0) of
+    Nothing -> Nothing
+    Just Pole1 -> case landRight 4 Pole1 of
+        Nothing -> Nothing
+        Just Pole2 -> case landLeft 2 Pole2 of
+            Nothing -> Nothing
+            Just Pole3 -> landLeft 1 Pole3
+
+```
+do-block impl
+```
+routine :: Maybe Pole
+routine = do
+    start <- return (0, 0)
+    first <- landLeft 2 start
+    sec   <- landRight 3 first
+    landLeft 1 sec
+```
+
+action chain primitive impl
+```
+foo :: Maybe String
+foo = Just 3 >>= (\x ->
+      Just "!" >>= (\y ->
+      Just (show x ++ y)))
+```
+
+do block impl
+```
+foo' :: Maybe String
+foo' = do
+    x <- Just 3
+    y <- Just "!"
+    Just (show x ++ y)
+```
+
+2. understanding do-block
+in do notation, when we bind monadic values to name, we can utilize pattern matching, just like `let` expressions and function parameters.
+```
+justH :: Maybe [Char]
+justH = do
+    (x:xs) <- Just "hello"
+    return xs
+```
+
+## Monad
+### list Monad
+1.defination
+```
+instance Monad [] where
+    return x = [x]
+    xs >>= f = concat (map f xs)
+    fail _ = []
+```
+```
+[1,2] >>= \n -> ['a', 'b'] >>= \ch -> return (n, ch) -- [(1, 'a'), (1, 'b'), (2, 'a'), (2, 'b')]
+```
+[1,2] bind to n, and ['a', 'b'] bind to ch. 
+
+do-block impl
+```
+listOfTuples :: [(Int, Char)]
+listOfTuples = do
+    n <- [1,2]
+    ch <- ['a', 'b']
+    return (n, ch)
+```
+
+list comprehension impl
+```
+[(n, ch) | n <- [1, 2], ch <- ['a', 'b']]
+```
+
+```
+[x | x <- [1..50], '7' `elem` show x]
+```
+here `show` is the point.
+
+### `MonadPlus`
+1. defination
+
+```
+class Monad m => MonadPlus m where
+    mzero :: m a
+    mplus :: m a -> m a -> m a
+```
+`mzero` is synonymous to `mempty`, `mplus` to `mappend`.
+```
+instance MonadPlus [] where
+    mzero = []
+    mplus = (++)
+```
+
+2. `guard`
+```
+guard' :: (MonadPlus m) => Bool -> m ()
+guard' True = return ()
+guard' False = mzero
+```
+not so much useful in normal context, but it's useful in monad chain operations.
+```
+[1..50] >>= (\x -> guard ('7' `elem` show x) >> return x)
+```
+so A `guard` basically says: if this boolean is `False` then produce a failure right here,
+otherwise make a successful value that has a dummy result of () inside it. all this does is to allow the computation to continue.
+
+example of guard
+```
+type KnightPos = (Int, Int)
+
+moveKnight :: KnightPos -> [KnightPos]
+moveKnight (c, r) = do
+    (c', r') <- [(c+2, r-1), (c+2, r+1), (c-2, r-1), (c-2, r+1),
+                 (c+1, r-2), (c+1, r+2), (c-1, r-2), (c-1, r+2)]
+    guard (c' `elem` [1..8] && r' `elem` [1..8])
+    return (c', r')
+
+in3 :: KnightPos -> [KnightPos]
+in3 start = do
+    first <- moveKnight start
+    second <- moveKnight first
+    moveKnight second
+
+canReachIn3 :: KnightPos -> KnightPos -> Bool
+canReachIn3 start end = end `elem` in3 start
+```
+I really like this example, this is application regarding `move`
+
+
