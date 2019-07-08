@@ -714,3 +714,90 @@ finalCountDown' x = do
 mapM\_ putStrLn $ fromDiffList $ snd $ runWriter (finalCount 20000)
 mapM\_ putStrLn $ snd $ runWriter (finalCount' 20000)
 ```
+
+## `State` Monad
+### primitive impl 
+
+```
+type Stack = [Int]
+pop :: Stack -> (Int, Stack)
+pop []     = (0, [])
+pop (x:xs) = (x, xs)
+
+push :: Int -> Stack -> ((), Stack)
+push a xs = ((), a:xs)
+
+stackMainip :: Stack -> (Int, Stack)
+stackMainip stack = let
+    ((), newStack1) = push 3 stack
+    (a, newStack2) = pop newStack1
+    in pop newStack2
+```
+better we impl it as
+```
+stackMainip = do
+    push 3
+    a <- pop
+    pop
+```
+### defination
+1. stateful computation in `Control.Monad.State`
+2. defination
+```
+newtype State s a = State {runState :: s -> (a, s)}
+```
+monad instance
+```
+instance Monad (State s) where
+    return x = State $ \s -> (x, s)
+    (State h) >>= f = State $ \s -> let (a, newState) = h s
+                                        (State g) = f a
+                                    in g newState
+```
+`h` is stateful computation, `>>=` to `f` means we need to unwrap (a, s) from `h` firstly.
+in `h` context, we already have a pair (a, s), in order to work continue, we'd better extract this pair from the first context.
+so we have `let (a, newState) = h s`. `s` is previous state, `newState` is new produced state.
+`State g = f a`, how to understand this? what is type of `f`? `f` is a function, this func works on result `a` and produce a new stateful computation `g`.but how and why?
+`g newState` means `g` apply to `newState`, so we get final result, it's a tuple `(a, s)`
+`g` is `s-> (a, s)`.
+so with bind operator, we kind of glue two stateful computation. so `f` is stateful computation too.
+
+3. state impl
+```
+pop :: State Stack Int
+pop = state $ \(x:xs) -> (x, xs)
+
+push :: Int -> State Stack ()
+push a = state $ \xs -> ((), a:xs)
+
+stackMainip :: State Stack Int
+stackMainip = do
+    push 4
+    pop
+    pop
+
+```
+use case
+```
+runState stackMainip [3, 4, 6]
+```
+can't be `runState (stackMainip [3, 4, 6])`, because runState defination, need two parameters.
+[cmt] this example, state is a list and result is integer.
+so state could be any type.
+
+4. StateMonad
+```
+get = State $ \s -> (s, s)
+put newState = State $ \s -> ((), newState)
+(>>=) :: State s a -> (a -> State s b) -> State s b
+```
+
+```
+stackyStack :: State Stack ()
+stackyStack = do
+    stackNow <- get
+    if stackNow == [1, 2, 3]
+       then put [8, 3, 1]
+       else put [9, 2, 1]
+
+```
