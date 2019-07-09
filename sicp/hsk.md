@@ -782,6 +782,7 @@ use case
 runState stackMainip [3, 4, 6]
 ```
 can't be `runState (stackMainip [3, 4, 6])`, because runState defination, need two parameters.
+
 [cmt] this example, state is a list and result is integer.
 so state could be any type.
 
