@@ -762,6 +762,13 @@ so we have `let (a, newState) = h s`. `s` is previous state, `newState` is new p
 `g` is `s-> (a, s)`.
 so with bind operator, we kind of glue two stateful computation. so `f` is stateful computation too.
 
+`runState` version
+```
+mv >>= g = State (\st -> 
+               let (y, st') = runState mv st
+               in runState (g y) st')
+```
+
 3. state impl
 ```
 pop :: State Stack Int
@@ -802,3 +809,46 @@ stackyStack = do
        else put [9, 2, 1]
 
 ```
+until now, I still can't understand State monad exactly. for example, how to
+construct it? what I mostly interact with? object or function.
+below is "yet another monad tutorial" state monad part.
+
+autho says: the basic idea of a state monad is to allow us to represent
+functions which interact with local/global state variables.
+
+[cmt]so from this, we should know, actually, we are working on functions if we work
+with state monad.
+
+[author] essentially, they allow us to simulate some aspects of imperative
+programming in a purely functional setting.
+
+[cmt] so this is the reason why you see state operation inside do-block. only
+inside State context, you can put/get, but can't operate them in normal world.
+
+```
+newtype State s b = State (s -> (b, s))
+```
+so for state, the monadic value is function `(s -> (b, s))`, but what about
+the initial `s` and `b`
+
+```
+type Stack = [Int]
+push :: Int -> State Stack Int
+push a = state $ \xs -> (a, a : xs)
+
+pop :: State Stack Int
+pop = state $ \(x:xs) -> (x, xs)
+
+runState (push 3) [2, 3, 4] -- (3, [2, 3, 4])
+runState pop [2, 3, 9]      -- (2, [3, 9])
+runState (return 3) [3, 4, 5]
+
+```
+`runState` equation is:
+```
+runState func initState
+```
+for function, has to return `State Stack Int` format, this is `state` value
+constructor format. so actually format `State Stack Int` is equal to `(s -> (a,
+                                                                             s))`
+this is very important.
