@@ -852,3 +852,10 @@ for function, has to return `State Stack Int` format, this is `state` value
 constructor format. so actually format `State Stack Int` is equal to `(s -> (a,
                                                                              s))`
 this is very important.
+
+## using cabal sandbox
+```
+cabal sandbox init
+cabal install parsec HUnit
+cabal repl
+```
