@@ -128,4 +128,45 @@ think when to use different threshing type?
 C++:
   - Mat.rows() get rows number, Mat.Size() get rows X cols
 
+### sobel derivatives
+1. theory
+  - sobel operator is a discrete differentiation operator. it computes an approximation of the gradient of an image intensity function.
+  - the sobel operator combines Gaussian smoothing and differentiation.
+  - generates output image with the detected edges bright on a darker background.
 
+### Laplace operator
+1. theory
+  - use the second derivative (==0) to detect edges in an image. regarding zero in other meaningless locations, can be solved by applying filtering where needed. (but how, how to tell it's not edges).
+  - uses the gradient of image, it calls internally the sobel operator to perform its computation.
+
+2. reference code
+`ImgTrans/Laplacian_Demo`
+
+3. tips
+steps:
+ - loads image
+ - remove noise by applying a Gaussian blur and then convert the original image to grayscale
+ - apply a Laplacian operator
+
+### Canny Edge Detector
+1. theory
+  - optimal detector
+  - low error rate (only existent edges), good localization (the distance between detected edge pixels and real edge pixels to be minimized.) only one detector response per edge.
+
+### Hough Line Transform
+1. theory
+  - it is a transform used to detect straight lines.
+  - an edge detection pre-processing is desirable, in order to apply the transform.
+  - line in image can be expressed: two coordinate syste a.Cartesian and Polar coordinate system.
+  - Hough transforms, express line in the Polar system.
+  - if the curves of two different points intersect in the plane (theta - r), that means that both points belong to a same line.
+    this means a line can be detected by finding the number of intersections between curves. the more curves intersecting means that the line represented by that intersection have more points.
+    in general, we can define a threshold of the minimum number of intersections needed to detect a line.
+  - this is what the Hough Line trans does. it keeps track of the intersection between curves of every point in the image. if the number of intersections is above some threshold, the it declares it as a line with the params (theta, r) of the intersection point.
+
+### Histogram Equalization
+1. theory
+  - intensity distribution of an image to another distribution. to another distribution.
+  - each color channel
+  - improve the constrast in an image, in order to stretch out the intensity range.
+  - how to equalizate? mapping one distribution (the given histogram) to another distribution.
