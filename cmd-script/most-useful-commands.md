@@ -587,3 +587,10 @@ sudo adb start-server
 V => select area
 gq
 ```
+
+## mount usb
+```
+lsblk
+sudo mount /dev/sdb /media
+sudo umount /media
+```
