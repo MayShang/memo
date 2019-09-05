@@ -594,3 +594,23 @@ lsblk
 sudo mount /dev/sdb /media
 sudo umount /media
 ```
+
+## nfs server and client
+### server
+```
+sudo apt-get update
+sudo apt-get install nfs-kernel-server
+sudo mkdir -p /var/nfs
+sudo chown nobody:nogroup /var/nfs
+vim /etc/exports
+> /var/nfs *(rw,sync,no_subtree_check,no_root_squash)
+sudo systemctl restart nfs-kernel-server
+systemctl status nfs-kernel-server
+```
+
+### client
+```
+sudo apt-get update
+sudo apt-get install nfs-common
+sudo mount nfs-ip:/var/nfs /mnt
+```
