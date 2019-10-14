@@ -6,6 +6,7 @@ import numpy as np
 import cv2 as cv
 import time
 import threading
+import sys, getopt
 
 # local modules
 from video import create_capture
@@ -16,6 +17,7 @@ class Person:
         self.roi = roi
         self.vec = vec
         self.hit = hit
+        self.frames = []
 
 def show(img):
     cv.namedWindow('image', cv.WINDOW_AUTOSIZE)
@@ -27,6 +29,7 @@ netRecogn = cv.dnn.readNetFromTorch('data/face_recognition.t7')
 persons = []
 index = 0
 confThreshold = 0.5
+recogMatchThreshold = 0.5
 
 def detectFaces_blob(img, netDet):
     faces = []
@@ -98,6 +101,9 @@ def draw_rects(img, rects, color):
         # blob
         # cv.rectangle(img, (x1, y1), (x1 + x2, y1 + y2), color)
 
+def face_recog(img, rects, frm_num):
+    face_roi = []
+    for x1, y1, x2, y2 in rects:
         roi = img[y1:y2, x1:x2]
 
         vec = face2vec(roi, netRecogn)
@@ -105,9 +111,10 @@ def draw_rects(img, rects, color):
         if len(persons):
             for i, p in enumerate(persons):
                 score = np.dot(vec, p.vec.T)
-                if (score > 0.35):
+                if (score > recogMatchThreshold):
                     found = True
                     p.hit += 1
+                    p.frames.append(frm_num)
                     print('{} found {} times'.format(i, p.hit))
 
         if (found == False):
@@ -136,26 +143,31 @@ def showResult():
         result_plane[y : y + h, x : x + w] = imgr
         lastx = x + w
         draw_str(result_plane, (x, 20), 'hit:%d' % p.hit)
+        # for frm in p.frames:
+        #     print(frm)
 
-    cv.imshow("s", result_plane)
-    
-    cv.waitKey(0)
+    cv.imshow("result", result_plane)
+    cv.moveWindow("result", 100, 700)
 
-def main():
-    import sys, getopt
-    args, video_src = getopt.getopt(sys.argv[1:], '', ['cascade=', 'nested-cascade='])
-    try:
-        video_src = video_src[0]
-    except:
-        video_src = 0
-    args = dict(args)
-    cascade_fn = args.get('--cascade', "data/haarcascades/haarcascade_frontalface_alt.xml")
-    cascade = cv.CascadeClassifier(cv.samples.findFile(cascade_fn))
+    if cv.waitKey(5) == 27:
+        return
+
+def get_frmnum(selected_idx):
+    if selected_idx >= len(persons) or selected_idx < 0:
+        return []
+    for i, p in enumerate(persons):
+        if i == selected_idx:
+            return p.frames
+    return []
+
+def calc_frames(vsrc, casrc):
+    cascade = cv.CascadeClassifier(cv.samples.findFile(casrc))
 
     # netDet = cv.dnn.readNetFromCaffe('data/face_detector.prototxt', 'data/face_detector.caffemodel')
     # netRecogn = cv.dnn.readNetFromTorch('data/face_recognition.t7')
 
-    cam = create_capture(video_src, fallback='synth:bg={}:noise=0.05'.format(cv.samples.findFile('lena.jpg')))
+    cam = create_capture(vsrc, fallback='synth:bg={}:noise=0.05'.format(cv.samples.findFile('lena.jpg')))
+    frame_num = 0
 
     while True:
         ret, img = cam.read()
@@ -169,20 +181,84 @@ def main():
         rects = detectFaces_cascade(gray, cascade)
         vis = img.copy()
         draw_rects(vis, rects, (0, 255, 0))
+        face_recog(vis, rects, frame_num)
+        frame_num += 1
 
         # print('now {} persons'.format(len(persons)))
         cv.imshow('facedetect', vis)
-        time.sleep(0.03)
+        cv.moveWindow("facedetect", 100, 100)
+        # time.sleep(0.03)
 
         if cv.waitKey(5) == 27:
             break
+    del cam
 
-    print('total {} persons'.format(len(persons)))
+def disp_video(src, expect_frames):
+    expect_cam = create_capture(src)
+    frm_idx = 0
+
+    while True:
+        ret, imgx = expect_cam.read()
+        if imgx is None:
+            break
+
+        v = imgx.copy()
+        if frm_idx in expect_frames:
+            # print('idx in list {}'.format(frm_idx))
+            cv.imshow("expect", v)
+            cv.moveWindow("expect", 200, 500)
+            time.sleep(0.03)
+            if cv.waitKey(5) == 27:
+                break
+
+        frm_idx += 1
+
+def main():
+    args, video_src = getopt.getopt(sys.argv[1:], '', ['cascade=', 'nested-cascade='])
+    try:
+        video_src = video_src[0]
+    except:
+        video_src = 0
+    args = dict(args)
+    cascade_fn = args.get('--cascade', "data/haarcascades/haarcascade_frontalface_alt.xml")
+
+    calc_frames(video_src, cascade_fn)
+    
+    # print('total {} persons'.format(len(persons)))
     showResult()
 
+    while True:
+        msg = input("which people? enter num ")
+        if msg == 'x':
+            break
+        num = int(msg)
+        print('you select #{} '.format(num))
+
+        expect_frms = get_frmnum(num)
+        print(expect_frms)
+        # expect_frms0 = [2, 3, 4, 5, 9, 10, 11, 13, 
+        #                33, 34, 35, 37, 39, 42, 43, 44, 46, 47, 48, 49, 50, 51, 52, 54, 55, 56, 
+        #                76, 87, 88, 90, 91, 92, 93, 94, 95, 96, 97, 
+        #                144, 154, 156, 158, 167, 168, 174, 175, 177, 178, 179, 180, 183, 231, 232, 234, 235]
+        # expect_frms1 = [18, 21, 22, 24, 25, 26, 33, 34, 35, 37, 39, 
+        #                 44, 46, 47, 48, 49, 50, 51, 52, 54, 55, 56, 
+        #                 76, 87, 88, 91, 92, 93, 94, 95, 96, 97, 154, 156, 174, 175, 230, 231, 232, 236]
+        # expect_frms2 = [66, 69, 70, 71, 74, 75, 76, 82, 83, 84, 87, 88, 88, 89, 
+        #                 90, 93, 94, 146, 150, 200, 201, 202, 203, 204, 205, 206, 
+        #                 207, 208, 209, 210, 211, 212, 213, 230, 231, 232, 234, 236,
+        #                 239, 240, 241, 242, 247, 248, 249, 250, 251, 252, 253, 255, 256, 258, 260]
+        # expect_frms3 = [144, 146, 149, 150, 183, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 
+        #                 210, 211, 212, 213, 230, 232, 234, 236, 239, 240, 241, 242,
+        #                 247, 248, 249, 250, 251, 252, 253, 255, 256, 258, 260]
+        
+        disp_video(video_src, expect_frms)
+
+    
 if __name__ == '__main__':
     print(__doc__)
     main()
     cv.destroyAllWindows()
+
+
 
 
