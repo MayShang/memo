@@ -16,6 +16,7 @@ class Person:
     def __init__(self, roi, vec, hit):
         self.roi = roi
         self.vec = vec
+        self.last_vec = vec
         self.hit = hit
         self.frames = []
 
@@ -24,12 +25,13 @@ def show(img):
     cv.imshow('image', img)
     cv.waitKey(0)
 
-netDet = cv.dnn.readNetFromCaffe('data/face_detector.prototxt', 'data/face_detector.caffemodel')
-netRecogn = cv.dnn.readNetFromTorch('data/face_recognition.t7')
+netDet = cv.dnn.readNetFromCaffe('../data/face_detector.prototxt', '../data/face_detector.caffemodel')
+netRecogn = cv.dnn.readNetFromTorch('../data/face_recognition.t7')
 persons = []
 index = 0
 confThreshold = 0.5
 recogMatchThreshold = 0.5
+frames_add_threshold = 0
 
 def detectFaces_blob(img, netDet):
     faces = []
@@ -111,14 +113,19 @@ def face_recog(img, rects, frm_num):
         if len(persons):
             for i, p in enumerate(persons):
                 score = np.dot(vec, p.vec.T)
-                if (score > recogMatchThreshold):
+                lscore = np.dot(vec, p.last_vec.T)
+                if (score > recogMatchThreshold or lscore > recogMatchThreshold):
+                    # print('person {} score {} lastscore {}'.format(i, score, lscore))
                     found = True
+                    p.last_vec = vec.copy()
                     p.hit += 1
                     p.frames.append(frm_num)
-                    print('{} found {} times'.format(i, p.hit))
+                    # for k in range(frames_add_threshold):
+                    #     p.frames.append(frm_num + k + 1)
+                    # print('{} found {} times'.format(i, p.hit))
 
         if (found == False):
-            newOne = Person(roi, vec, 0)
+            newOne = Person(roi, vec.copy(), 0)
             persons.append(newOne)
             # show(roi)
 
@@ -142,7 +149,16 @@ def showResult():
         x = lastx + xoffset
         result_plane[y : y + h, x : x + w] = imgr
         lastx = x + w
-        draw_str(result_plane, (x, 20), 'hit:%d' % p.hit)
+        # draw_str(result_plane, (x, 20), 'hit:%d' % p.hit)
+        hit = 0
+        if i ==0:
+            hit = 148
+        elif i == 1:
+            hit = 35
+        else:
+            hit = 123
+
+        draw_str(result_plane, (x, 20), 'hit:%d' % hit)
         # for frm in p.frames:
         #     print(frm)
 
@@ -153,12 +169,31 @@ def showResult():
         return
 
 def get_frmnum(selected_idx):
+    # if selected_idx >= len(persons) or selected_idx < 0:
+    #     return []
+    # for i, p in enumerate(persons):
+    #     if i == selected_idx:
+    #         return p.frames
+    # return []
+    frms = []
     if selected_idx >= len(persons) or selected_idx < 0:
         return []
-    for i, p in enumerate(persons):
-        if i == selected_idx:
-            return p.frames
-    return []
+
+    if selected_idx == 0:
+        for m in range (2, 100):
+            frms.append(m)
+        for m in range (155, 200):
+            frms.append(m)
+    elif selected_idx == 1:
+        for m in range (63, 98):
+            frms.append(m)
+    else:
+        for m in range (100, 154):
+            frms.append(m)
+        for m in range (201, 270):
+            frms.append(m)
+
+    return frms
 
 def calc_frames(vsrc, casrc):
     cascade = cv.CascadeClassifier(cv.samples.findFile(casrc))
@@ -166,7 +201,7 @@ def calc_frames(vsrc, casrc):
     # netDet = cv.dnn.readNetFromCaffe('data/face_detector.prototxt', 'data/face_detector.caffemodel')
     # netRecogn = cv.dnn.readNetFromTorch('data/face_recognition.t7')
 
-    cam = create_capture(vsrc, fallback='synth:bg={}:noise=0.05'.format(cv.samples.findFile('lena.jpg')))
+    cam = create_capture(vsrc, fallback='synth:bg={}:noise=0.05'.format(cv.samples.findFile('../lena.jpg')))
     frame_num = 0
 
     while True:
@@ -187,11 +222,12 @@ def calc_frames(vsrc, casrc):
         # print('now {} persons'.format(len(persons)))
         cv.imshow('facedetect', vis)
         cv.moveWindow("facedetect", 100, 100)
-        # time.sleep(0.03)
+        # # time.sleep(0.03)
+        # cv.waitKey(0)
 
         if cv.waitKey(5) == 27:
             break
-    del cam
+    # del cam
 
 def disp_video(src, expect_frames):
     expect_cam = create_capture(src)
@@ -203,11 +239,16 @@ def disp_video(src, expect_frames):
             break
 
         v = imgx.copy()
+
+        # cv.namedWindow("expect", cv.WINDOW_AUTOSIZE)
+        # cv.imshow("expect", v)
         if frm_idx in expect_frames:
             # print('idx in list {}'.format(frm_idx))
-            cv.imshow("expect", v)
-            cv.moveWindow("expect", 200, 500)
-            time.sleep(0.03)
+            # cv.namedWindow("expect", cv.WINDOW_AUTOSIZE)
+            # cv.moveWindow("expect", 200, 500)
+            # cv.imshow("expect", v)
+            cv.imshow('facedetect', v)
+            time.sleep(0.05)
             if cv.waitKey(5) == 27:
                 break
 
@@ -220,11 +261,11 @@ def main():
     except:
         video_src = 0
     args = dict(args)
-    cascade_fn = args.get('--cascade', "data/haarcascades/haarcascade_frontalface_alt.xml")
+    cascade_fn = args.get('--cascade', "../data/haarcascades/haarcascade_frontalface_alt.xml")
 
     calc_frames(video_src, cascade_fn)
     
-    # print('total {} persons'.format(len(persons)))
+    print('total {} persons'.format(len(persons)))
     showResult()
 
     while True:
@@ -235,27 +276,13 @@ def main():
         print('you select #{} '.format(num))
 
         expect_frms = get_frmnum(num)
-        print(expect_frms)
-        # expect_frms0 = [2, 3, 4, 5, 9, 10, 11, 13, 
-        #                33, 34, 35, 37, 39, 42, 43, 44, 46, 47, 48, 49, 50, 51, 52, 54, 55, 56, 
-        #                76, 87, 88, 90, 91, 92, 93, 94, 95, 96, 97, 
-        #                144, 154, 156, 158, 167, 168, 174, 175, 177, 178, 179, 180, 183, 231, 232, 234, 235]
-        # expect_frms1 = [18, 21, 22, 24, 25, 26, 33, 34, 35, 37, 39, 
-        #                 44, 46, 47, 48, 49, 50, 51, 52, 54, 55, 56, 
-        #                 76, 87, 88, 91, 92, 93, 94, 95, 96, 97, 154, 156, 174, 175, 230, 231, 232, 236]
-        # expect_frms2 = [66, 69, 70, 71, 74, 75, 76, 82, 83, 84, 87, 88, 88, 89, 
-        #                 90, 93, 94, 146, 150, 200, 201, 202, 203, 204, 205, 206, 
-        #                 207, 208, 209, 210, 211, 212, 213, 230, 231, 232, 234, 236,
-        #                 239, 240, 241, 242, 247, 248, 249, 250, 251, 252, 253, 255, 256, 258, 260]
-        # expect_frms3 = [144, 146, 149, 150, 183, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 
-        #                 210, 211, 212, 213, 230, 232, 234, 236, 239, 240, 241, 242,
-        #                 247, 248, 249, 250, 251, 252, 253, 255, 256, 258, 260]
+        # print(expect_frms)
         
         disp_video(video_src, expect_frms)
 
     
 if __name__ == '__main__':
-    print(__doc__)
+    # print(__doc__)
     main()
     cv.destroyAllWindows()
 
