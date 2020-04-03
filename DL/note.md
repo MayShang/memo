@@ -1038,4 +1038,7 @@ Think about what you will probably have to do when you will be doing ML codeing 
 * hpsearch folder: contain any helpers for doing custom hyper-parameters search. keep those functions pure and sparated so you can test them easily.
 
 
+## reference
+https://chromium.googlesource.com/external/github.com/tensorflow/tensorflow/+/r0.7/tensorflow/g3doc/tutorials/index.md
 
+https://github.com/pkmital/tensorflow_tutorials.git

@@ -22,7 +22,7 @@ change `DocumentRoot`
 
 ### ffplay http playback
 1. put file in `/var/www/html`, including media files
-2. console : `ffplay http://10.70.53.28/v.mpg`
+2. console : `ffplay http://xx.xx.xx.xx/v.mpg`
 
 
 ## apache2 && python && mysql
@@ -96,3 +96,8 @@ https://docs.djangoproject.com/en/2.2/intro/whatsnext/
 
 ## google/ExoPlayer
 playback streaming
+
+## deploy flask
+```
+uwsgi --http xx.xx.xx.xx:5000 --module xtest:app
+```
