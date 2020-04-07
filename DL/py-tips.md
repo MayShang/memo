@@ -80,3 +80,20 @@ reproduce the input at the output layer, but why? where to use this nn.
   - generate entirely new content
   - teach a computer to read and synthesize new phrases
   - generate music with DL
+<<<<<<< caeca0f66a533bd290032853ec6a367b5c47f39b
+=======
+
+11. need to look into
+  - reinforcement learning
+  - dictionary learning
+  - probabilistic graphical models
+  - bayesian methods(Bishop)
+  - genetic and evolutionary algorithms
+
+12. flatten operation(numpy)
+  - np.ravel(data) or data.ravel()
+
+13. basic tf calling sequence
+1. g = tf.get_default_graph()
+
+>>>>>>> x

@@ -575,12 +575,87 @@ git merge commit-id
 git log --online --after="2018-03-18"
 ```
 
+#### more git log
+
+Option	Description
+-p
+
+Show the patch introduced with each commit.
+
+--stat
+
+Show statistics for files modified in each commit.
+
+--shortstat
+
+Display only the changed/insertions/deletions line from the --stat command.
+
+--name-only
+
+Show the list of files modified after the commit information.
+
+--name-status
+
+Show the list of files affected with added/modified/deleted information as well.
+
+--abbrev-commit
+
+Show only the first few characters of the SHA-1 checksum instead of all 40.
+
+--relative-date
+
+Display the date in a relative format (for example, “2 weeks ago”) instead of using the full date format.
+
+--graph
+
+Display an ASCII graph of the branch and merge history beside the log output.
+
+--pretty
+
+Show commits in an alternate format. Options include oneline, short, full, fuller, and format (where you specify your own format).
+
+--oneline
+
+Shorthand for --pretty=oneline --abbrev-commit used together.
+
+-<n>
+
+Show only the last n commits
+
+--since, --after
+--since "2020-60-12"
+
+Limit the commits to those made after the specified date.
+
+--until, --before
+
+Limit the commits to those made before the specified date.
+
+--author
+
+Only show commits in which the author entry matches the specified string.
+
+--committer
+
+Only show commits in which the committer entry matches the specified string.
+
+--grep
+
+Only show commits with a commit message containing the string
+
+-S
+
+Only show commits adding or removing code matching the string
+git log -S"hello"
+
+git log -- filenme
+gitk filename
+
 ## adb
 ```
 sudo adb kill-server
 sudo adb start-server
 ```
-
 ## vim: break long line
 ```
 :set tw=80
@@ -614,3 +689,4 @@ sudo apt-get update
 sudo apt-get install nfs-common
 sudo mount nfs-ip:/var/nfs /mnt
 ```
+

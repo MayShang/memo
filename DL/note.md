@@ -928,6 +928,14 @@ docker work logic is based on server, and we can build image with all services, 
 and if we have a docker, webserver using all components will become really easy.
 continue reading docker tutorial docs. actually all of them are beautiful system.
 
+### docker rm container and images
+```
+docker ps -a -q                   #ps container
+docker rm -f $(docker ps -a -q)   #delete container
+docker rmi -f $(docker images -q) #rm all images
+docker system prune
+```
+
 ## models
 ### image classification
 https://cv-tricks.com/tensorflow-tutorial/training-convolutional-neural-network-for-image-classification/
@@ -1042,3 +1050,23 @@ Think about what you will probably have to do when you will be doing ML codeing 
 https://chromium.googlesource.com/external/github.com/tensorflow/tensorflow/+/r0.7/tensorflow/g3doc/tutorials/index.md
 
 https://github.com/pkmital/tensorflow_tutorials.git
+
+### yuv2rgb
+yuv420sp to rgb24
+```
+/// uint8_t * Y;
+/// uint8_t * out;
+
+// 2 planes for NV12: Y and interleaved UV
+uint8_t * data[2] = {Y, Y + Stride * Height};
+
+// Strides for Y and UV
+// U and V have Stride/2 bytes per line;
+// Thus, we have 2 * Stride/2 bytes per line in UV plane
+int linesize[2] = {Stride, Stride};
+
+uint8_t * outData[1] = {out}; // RGB have one plane
+int outLinesize[1] = {frameWidth*4}; // RGB32 Stride
+
+sws_scale(context, data, linesize, 0, Height, outData, outLinesize);
+```
