@@ -1,3 +1,29 @@
 cmake -D BUILD_opencv_java=OFF -D HAVE_opencv_java=OFF -D BUILD_SHARED_LIBS=ON -DCMAKE_TOOLCHAIN_FILE=/home/s/android-ndk-r18b/build/cmake/android.toolchain.cmake ../../..
 
 cmake -D BUILD_opencv_java=OFF -D HAVE_opencv_java=OFF -D BUILD_EXAMPLES=ON -D INSTALL_C_EXAMPLES=ON -DCMAKE_TOOLCHAIN_FILE=/home/s/android-ndk-r18b/build/cmake/android.toolchain.cmake ../../..
+
+
+-DCMAKE_TOOLCHAIN_FILE=E:\Android\Sdk\ndk-bundle\build\cmake\android.toolchain.cmake 
+-DANDROID_NDK=E:\Android\Sdk\ndk-bundle 
+-DANDROID_ABI="armeabi-v7a" 
+-DANDROID_SDK=E:\Android\Sdk 
+-DWITH_TBB=ON 
+-DCPU_BASELINE=NEON 
+-DCPU_DISPATCH=NEON 
+-DOPENCV_ENABLE_NONFREE=ON 
+-DBUILD_ANDROID_EXAMPLES=OFF 
+-DBUILD_ANDROID_PROJECTS=OFF 
+-DINSTALL_ANDROID_EXAMPLES=OFF 
+-DANDROID_NATIVE_API_LEVEL=21 
+-DOPENCV_EXTRA_MODULES_PATH=F:\opencv_401\opencv_contrib_401\modules 
+-DCMAKE_CXX_FLAGS:STRING=-O3 
+-DCMAKE_C_FLAGS:STRING=-O3 
+-DCMAKE_BUILD_TYPE:STRING=Release 
+-DBUILD_JAVA=OFF 
+-DBUILD_ZLIB:BOOL=ON 
+-DBUILD_opencv_world=ON 
+-DBUILD_FAT_JAVA_LIB:BOOL=OFF 
+-DBUILD_PERF_TESTS:BOOL=OFF 
+-DBUILD_TESTS:BOOL=OFF 
+-G "Ninja"
+-DCMAKE_MAKE_PROGRAM=E:\Android\Sdk\cmake\3.10.2.4988404\bin\ninja.exe ../

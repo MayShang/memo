@@ -75,4 +75,24 @@ export CROSS_COMPILE=aarch64-linux-gnu-
 make
 ```
 
+reference:
+https://linuxhint.com/understanding_vm_swappiness/
+Links and References
+* [1] Linux Kernel Tutorial for Beginners, https://linuxhint.com/linux-kernel-tutorial-beginners/
+
+* [2] Derek Molloy: Writing a Linux Kernel Module — Part 1: Introduction, http://derekmolloy.ie/writing-a-linux-kernel-module-part-1-introduction/
+
+* [3] Derek Molloy: Writing a Linux Kernel Module — Part 2: A Character Device, http://derekmolloy.ie/writing-a-linux-kernel-module-part-2-a-character-device/
+
+* [4] Derek Molloy: Writing a Linux Kernel Module — Part 3: Buttons and LEDs, http://derekmolloy.ie/kernel-gpio-programming-buttons-and-leds/
+
+* [5] Frank Hofmann: Commands to Manage Linux Memory, https://linuxhint.com/commands-to-manage-linux-memory/
+
+* [6] Frank Hofmann: Linux Kernel Memory Management: Swap Space, https://linuxhint.com/linux-memory-management-swap-space/
+
+* [7] dphys-swapfile package for Debian GNU/Linux, https://packages.debian.org/stretch/dphys-swapfile
+
+* [8] Red Hat Performance Tuning Guide, https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/performance_tuning_guide/s-memory-tunables
+
+* [9] Configuring MariaDB, https://mariadb.com/kb/en/library/configuring-swappiness/
 
